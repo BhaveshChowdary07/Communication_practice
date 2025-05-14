@@ -45,9 +45,20 @@ def dashboard():
     student = User.query.get(student_id)
 
     test_maps = StudentTestMap.query.filter_by(student_id=student_id).all()
-    tests = [Test.query.get(tm.test_id) for tm in test_maps if Test.query.get(tm.test_id)]
+    enriched_tests = []
 
-    return render_template("student_dashboard.html", tests=tests, student=student)
+    for tm in test_maps:
+        test = Test.query.get(tm.test_id)
+        if test:
+            section_ids = [int(sid) for sid in test.sections.split(',') if sid.strip()]
+            sections = Section.query.filter(Section.id.in_(section_ids)).all()
+            enriched_tests.append({
+                'test': test,
+                'sections': sections
+            })
+
+    return render_template("student_dashboard.html", tests=enriched_tests, student=student)
+
 
 @bp.route('/test/<int:test_id>')
 @jwt_required(role='student')
@@ -69,15 +80,14 @@ def test_sections(test_id):
 
     return render_template("test_sections.html", test=test, sections=sections)
 
-@bp.route('/section/<int:section_id>', methods=['GET'])
+@bp.route('/section/<int:section_id>', methods=['GET', 'POST'])
 @jwt_required(role='student')
 def take_section(section_id):
     student_id = request.user_id
 
-    # Verify student is assigned to this section
+    # Validate test assignment
     test_maps = StudentTestMap.query.filter_by(student_id=student_id).all()
     matched_test = None
-
     for test_map in test_maps:
         test = Test.query.get(test_map.test_id)
         if test and str(section_id) in test.sections.split(','):
@@ -90,17 +100,13 @@ def take_section(section_id):
 
     section = Section.query.get(section_id)
 
-    # Determine how many questions to fetch
-    section_ids = [sid.strip() for sid in matched_test.sections.split(',') if sid.strip()]
-    question_counts = [int(q.strip()) for q in matched_test.num_questions.split(',') if q.strip()]
-
-    if len(section_ids) != len(question_counts):
-        flash("Test is misconfigured: section and question count mismatch.", "danger")
-        return redirect(url_for('student_routes.dashboard'))
-
+    # Get question count
+    section_ids = matched_test.sections.split(',')
+    question_counts = matched_test.num_questions.split(',')
     index = section_ids.index(str(section_id))
-    question_limit = question_counts[index]
+    question_limit = int(question_counts[index])
 
+    # Fetch questions with grammar-safe sampling
     if section.type == 'grammar':
         all_questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(SectionQuestion.id).all()
         model1 = all_questions[0:50]
@@ -108,16 +114,32 @@ def take_section(section_id):
         model3 = all_questions[100:150]
 
         chunk = question_limit // 3
-        questions = (
-            sample(model1, chunk) +
-            sample(model2, chunk) +
-            sample(model3, question_limit - 2 * chunk)
-        )
+        q1 = sample(model1, min(chunk, len(model1)))
+        q2 = sample(model2, min(chunk, len(model2)))
+        remaining = max(0, question_limit - len(q1) - len(q2))
+        q3 = sample(model3, min(len(model3), remaining))
+        questions = q1 + q2 + q3
         shuffle(questions)
     else:
         questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
 
-    return render_template("take_section.html", section=section, questions=questions)
+    # Handle question index and navigation
+    current_index = 0
+    if request.method == 'POST':
+        try:
+            current_index = int(request.form.get('current_index', 0))
+        except ValueError:
+            current_index = 0
+
+        if 'next' in request.form:
+            current_index = min(current_index + 1, len(questions) - 1)
+        elif 'prev' in request.form:
+            current_index = max(current_index - 1, 0)
+        elif 'submit' in request.form:
+            flash("Section submitted!", "success")
+            return redirect(url_for('student_routes.dashboard'))
+
+    return render_template("take_section.html", section=section, questions=questions, current_index=current_index)
 
 @bp.route('/audio/<int:question_id>')
 @jwt_required(role='student')

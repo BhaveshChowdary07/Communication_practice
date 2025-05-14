@@ -11,7 +11,17 @@
         <div class="container">
             <h1 class="page-title">Create New Test</h1>
 
-            <form method="POST" class="test-card">
+            <!-- ✅ Flash message display -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- ✅ Action added -->
+            <form method="POST" action="{{ url_for('admin_routes.create_test') }}" class="test-card">
                 <label>Test Name</label>
                 <input type="text" name="test_name" placeholder="Enter test name" required>
 
@@ -38,16 +48,16 @@
                     {% for section in sections %}
                     <div class="section-card">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="sections[]" value="{{ section.id }}" id="section{{ section.id }}">
+                            <input class="form-check-input section-checkbox" type="checkbox" name="sections" value="{{ section.id }}" id="section{{ section.id }}" onchange="toggleSectionInputs({{ section.id }})">
                             <label class="form-check-label" for="section{{ section.id }}">
                                 <strong>{{ section.name }}</strong>
                                 <p class="text-muted">{{ section.description }}</p>
                             </label>
                         </div>
                         <label>Number of Questions</label>
-                        <input type="number" name="num_questions[]" min="1" placeholder="e.g. 5">
+                        <input type="number" name="num_questions_{{ section.id }}" min="1" placeholder="e.g. 5" class="section-input" disabled>
                         <label>Section Duration (mins)</label>
-                        <input type="number" name="section_durations[]" min="1" placeholder="e.g. 10">
+                        <input type="number" name="section_durations_{{ section.id }}" min="1" placeholder="e.g. 10" class="section-input" disabled>
                     </div>
                     {% endfor %}
                 </div>
@@ -56,5 +66,15 @@
             </form>
         </div>
     </div>
+    <script>
+    function toggleSectionInputs(sectionId) {
+        const checked = document.getElementById(`section${sectionId}`).checked;
+        const inputs = document.querySelectorAll(`[name="num_questions_${sectionId}"], [name="section_durations_${sectionId}"]`);
+        inputs.forEach(input => {
+            input.disabled = !checked;
+            if (!checked) input.value = "";
+        });
+    }
+    </script>
 </body>
 </html>

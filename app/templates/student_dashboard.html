@@ -5,10 +5,11 @@
   <title>Student Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/student_dashboard.css') }}" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="dashboard-gradient">
-    <div class="container">
+    <div class="container py-4">
       <h1 class="page-title">Welcome, {{ student.name }}</h1>
       <p class="subtitle">Here are your assigned tests:</p>
 
@@ -20,19 +21,37 @@
         {% endif %}
       {% endwith %}
 
-      <div class="test-grid">
-        {% for test in tests %}
-        <div class="test-card">
-          <h4>{{ test.test_name }}</h4>
-          <p><strong>Start:</strong> {{ test.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
-          <p><strong>End:</strong> {{ test.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
-          <a href="{{ url_for('student_routes.test_sections', test_id=test.id) }}" class="btn btn-take">Take Test</a>
-        </div>
-        {% else %}
-        <p class="text-muted">No tests assigned yet.</p>
+      {% if tests %}
+        <div class="test-grid">
+          {% for test in tests %}
+  <div class="test-card shadow-sm">
+    <h4>{{ test.test.test_name }}</h4>
+    <p><strong>Start:</strong> {{ test.test.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+    <p><strong>End:</strong> {{ test.test.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+    <button class="btn btn-take" data-bs-toggle="collapse" data-bs-target="#sections{{ loop.index }}">
+      Take Test
+    </button>
+
+    <div class="collapse mt-3" id="sections{{ loop.index }}">
+      <ul class="list-group list-group-flush">
+        {% for section in test.sections %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ section.name }}
+            <a href="{{ url_for('student_routes.take_section', section_id=section.id) }}" class="btn btn-sm btn-outline-success">Start Section</a>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
   </div>
+{% endfor %}
+
+        </div>
+      {% else %}
+        <div class="alert alert-warning mt-3">No tests assigned to you.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

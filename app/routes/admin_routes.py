@@ -42,42 +42,36 @@ def dashboard():
 @jwt_required(role='admin')
 def create_test():
     sections = Section.query.all()
+
     if request.method == 'POST':
         test_name = request.form['test_name']
-        # Fetch selected sections and corresponding input data
-        selected_sections = request.form.getlist('sections[]')
-        num_questions = request.form.getlist('num_questions[]')
-        section_durations = request.form.getlist('section_durations[]')
-
-        # ✅ Validate at least one section is selected
-        if not selected_sections:
-            flash("You must select at least one section to create a test.", "danger")
-            return redirect(request.url)
-
-        # ✅ Validate corresponding question counts and durations
-        valid_section_data = True
-        for i in range(len(selected_sections)):
-            try:
-                nq = int(num_questions[i])
-                dur = int(section_durations[i])
-                if nq <= 0 or dur <= 0:
-                    valid_section_data = False
-                    break
-            except (ValueError, IndexError):
-                valid_section_data = False
-                break
-
-        if not valid_section_data:
-            flash("Each selected section must have a valid number of questions and duration.", "danger")
-            return redirect(request.url)
-
         test_duration = int(request.form['test_duration'])
         start_date = datetime.strptime(request.form['start_date'], "%Y-%m-%dT%H:%M")
         end_date = datetime.strptime(request.form['end_date'], "%Y-%m-%dT%H:%M")
 
+        selected_sections = request.form.getlist('sections')
+        if not selected_sections:
+            flash("You must select at least one section to create a test.", "danger")
+            return redirect(request.url)
+
+        section_ids = []
+        num_questions = []
+        section_durations = []
+
+        for sid in selected_sections:
+            nq = request.form.get(f'num_questions_{sid}')
+            dur = request.form.get(f'section_durations_{sid}')
+            if not nq or not dur or int(nq) <= 0 or int(dur) <= 0:
+                flash("Each selected section must have a valid number of questions and duration.", "danger")
+                return redirect(request.url)
+
+            section_ids.append(sid)
+            num_questions.append(nq)
+            section_durations.append(dur)
+
         test = Test(
             test_name=test_name,
-            sections=",".join(selected_sections),
+            sections=",".join(section_ids),
             num_questions=",".join(num_questions),
             section_durations=",".join(section_durations),
             test_duration=test_duration,
@@ -91,6 +85,8 @@ def create_test():
         return redirect(url_for('admin_routes.dashboard'))
 
     return render_template('create_test.html', sections=sections)
+
+
 
 @bp.route('/assign_test/<int:test_id>', methods=['GET', 'POST'])
 @jwt_required(role='admin')
