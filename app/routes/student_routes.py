@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
+from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response, send_file
 from werkzeug.security import check_password_hash
+from io import BytesIO
+from random import sample, shuffle
+
 from app import db
-from app.models import User, StudentTestMap, Test, Section
+from app.models import User, StudentTestMap, Test, Section, SectionQuestion
 from app.utils.jwt_utils import generate_token, jwt_required
-from app.models import Section, SectionQuestion
 
 bp = Blueprint('student_routes', __name__, url_prefix='/student')
 
@@ -20,7 +22,7 @@ def student_login():
 
         test_map = StudentTestMap.query.filter_by(student_id=student.id).first()
         if not test_map or not check_password_hash(student.password, password):
-            flash("Invalid credentials or no test assigned.", "danger")
+            flash("Incorrect password or no test assigned to this email.", "danger")
             return redirect(url_for('student_routes.student_login'))
 
         token = generate_token(student.id, 'student')
@@ -43,18 +45,13 @@ def dashboard():
     student = User.query.get(student_id)
 
     test_maps = StudentTestMap.query.filter_by(student_id=student_id).all()
-    tests = []
+    tests = [Test.query.get(tm.test_id) for tm in test_maps if Test.query.get(tm.test_id)]
 
-    for test_map in test_maps:
-        test = Test.query.get(test_map.test_id)
-        if test:
-            tests.append(test)
-
-    return render_template("student_dashboard.html", tests=tests, user_name=student.name)
+    return render_template("student_dashboard.html", tests=tests, student=student)
 
 @bp.route('/test/<int:test_id>')
 @jwt_required(role='student')
-def view_test_sections(test_id):
+def test_sections(test_id):
     student_id = request.user_id
     test_map = StudentTestMap.query.filter_by(student_id=student_id, test_id=test_id).first()
 
@@ -105,29 +102,26 @@ def take_section(section_id):
     question_limit = question_counts[index]
 
     if section.type == 'grammar':
-        # Split 150 grammar questions into 3 models
         all_questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(SectionQuestion.id).all()
         model1 = all_questions[0:50]
         model2 = all_questions[50:100]
         model3 = all_questions[100:150]
 
-        # Decide how many from each (even split)
-        from random import sample, shuffle
         chunk = question_limit // 3
-        questions = sample(model1, chunk) + sample(model2, chunk) + sample(model3, question_limit - 2 * chunk)
+        questions = (
+            sample(model1, chunk) +
+            sample(model2, chunk) +
+            sample(model3, question_limit - 2 * chunk)
+        )
         shuffle(questions)
     else:
-        # Default for other sections
         questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
 
     return render_template("take_section.html", section=section, questions=questions)
 
-
 @bp.route('/audio/<int:question_id>')
 @jwt_required(role='student')
 def get_question_audio(question_id):
-    from flask import send_file
-    from io import BytesIO
     question = SectionQuestion.query.get(question_id)
     if not question or not question.question_audio:
         return "Audio not found", 404
