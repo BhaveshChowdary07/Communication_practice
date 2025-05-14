@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ section.name }} - Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/grammar.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/essay.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="gradient-bg">
+    <div class="container">
+        <h1>{{ section.name }}</h1>
+        <div class="alert alert-info" id="timerDisplay">
+            ⏱️ Time Left: <span id="timeLeft"></span>
+        </div>
+        <p class="subtitle">{{ section.description }}</p>
+        <form method="POST" action="#">
+
+        {% set total = questions | length %}
+
+        {% if section.type == 'grammar_split' %}
+            {% for q in questions %}
+            <div class="row g-4 align-items-stretch grammar-box mb-4">
+                <div class="col-md-6 left-box">
+                    <h2 class="mb-3">Grammar</h2>
+                    <div class="instruction-box bg-light p-3 rounded">
+                        <h6>Question Instructions</h6>
+                        <p class="text-muted mb-0">Fill in the blank with the correct form of the word or phrase.</p>
+                    </div>
+                    <button class="btn btn-outline-secondary mt-4">← Previous</button>
+                </div>
+                <div class="col-md-6 right-box">
+                    <div class="question-box bg-white p-4 rounded shadow-sm">
+                        <h6 class="text-secondary mb-2">Question {{ loop.index }} of {{ total }}</h6>
+                        <p>{{ q.question_text | safe }}</p>
+                        <input type="text" name="grammar_answer_{{ q.id }}" class="form-control my-3" placeholder="Type your answer...">
+                        {% if total == 1 %}
+                            <button type="submit" class="btn btn-success mt-2">Submit</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-primary mt-2">Next →</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% elif section.type == 'grammar' %}
+            {% for q in questions %}
+            <div class="card my-4 p-4">
+                <label class="question">{{ q.question_text | safe }}</label>
+                <input type="text" name="grammar_answer_{{ q.id }}" class="form-control mt-2" placeholder="Type your answer...">
+            </div>
+            {% endfor %}
+
+        {% elif section.type == 'essay_writing' %}
+            {% for q in questions %}
+            <div class="card my-4 p-4">
+                <div class="topic-label">Topic:</div>
+                <div class="topic-text">{{ q.question_text }}</div>
+                <label class="response-label">Write your response below</label>
+                <textarea class="essay-box" name="essay_answer_{{ q.id }}" placeholder="Write your essay here..."></textarea>
+            </div>
+            {% endfor %}
+
+        {% elif section.type == 'just_a_minute' %}
+            {% for q in questions %}
+            <div class="card my-4 p-4">
+                <p>Listen to the topic and speak for one minute.</p>
+                <audio id="audio{{ q.id }}" controls>
+                    <source src="{{ url_for('student_routes.get_question_audio', question_id=q.id) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <br>
+                <div class="mt-2">
+                    <button type="button" class="btn btn-danger" onclick="startRecording('{{ q.id }}')">🎤 Start</button>
+                    <button type="button" class="btn btn-secondary" onclick="stopRecording()">⏹ Stop</button>
+                </div>
+                <div id="recording_{{ q.id }}" class="mt-2 text-muted">Not recording...</div>
+            </div>
+            {% endfor %}
+
+        {% elif section.type == 'sentence_reading' %}
+            {% for q in questions %}
+            <div class="card my-4 p-4">
+                <h5>Question {{ loop.index }}</h5>
+                <p>{{ q.question_text }}</p>
+                <p class="text-muted">[Audio recording input for reading will appear here]</p>
+            </div>
+            {% endfor %}
+
+        {% elif section.type == 'sentence_repeating' %}
+            {% for q in questions %}
+            <div class="card my-4 p-4">
+                <p>Listen and repeat the sentence:</p>
+                <audio id="audio{{ q.id }}" controls>
+                    <source src="{{ url_for('student_routes.get_question_audio', question_id=q.id) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <br>
+                <div class="mt-2">
+                    <button type="button" class="btn btn-danger" onclick="startRecording('{{ q.id }}')">🎤 Start</button>
+                    <button type="button" class="btn btn-secondary" onclick="stopRecording()">⏹ Stop</button>
+                </div>
+                <div id="recording_{{ q.id }}" class="mt-2 text-muted">Not recording...</div>
+            </div>
+            {% endfor %}
+
+        {% elif section.type == 'mcq' %}
+            {% for q in questions %}
+            <div class="card my-4 p-4">
+                <p>{{ q.question_text }}</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mcq_{{ q.id }}" value="A" id="q{{ q.id }}a">
+                    <label class="form-check-label" for="q{{ q.id }}a">{{ q.option_a }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mcq_{{ q.id }}" value="B" id="q{{ q.id }}b">
+                    <label class="form-check-label" for="q{{ q.id }}b">{{ q.option_b }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mcq_{{ q.id }}" value="C" id="q{{ q.id }}c">
+                    <label class="form-check-label" for="q{{ q.id }}c">{{ q.option_c }}</label>
+                </div>
+                {% if q.option_d %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mcq_{{ q.id }}" value="D" id="q{{ q.id }}d">
+                    <label class="form-check-label" for="q{{ q.id }}d">{{ q.option_d }}</label>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="alert alert-warning">Unsupported section type.</div>
+        {% endif %}
+
+        {% if section.type not in ['sentence_repeating', 'sentence_reading', 'just_a_minute'] %}
+            <button type="submit" class="submit-btn mt-4">Submit</button>
+        {% endif %}
+        </form>
+    </div>
+</div>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+function startRecording(questionId) {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = document.createElement('audio');
+      audio.controls = true;
+      audio.src = audioUrl;
+
+      const responseDiv = document.getElementById(`recording_${questionId}`);
+      responseDiv.innerHTML = '';
+      responseDiv.appendChild(audio);
+    };
+
+    mediaRecorder.start();
+    document.getElementById(`recording_${questionId}`).innerText = "Recording...";
+  });
+}
+
+function stopRecording() {
+  if (mediaRecorder) {
+    mediaRecorder.stop();
+  }
+}
+
+function startSectionTimer(minutes) {
+  let totalSeconds = minutes * 60;
+  const timerDisplay = document.getElementById('timeLeft');
+
+  const interval = setInterval(() => {
+    if (totalSeconds <= 0) {
+      clearInterval(interval);
+      alert("⏰ Time's up! Submitting the section.");
+      document.querySelector("form").submit();
+    }
+    const min = Math.floor(totalSeconds / 60);
+    const sec = totalSeconds % 60;
+    timerDisplay.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    totalSeconds--;
+  }, 1000);
+}
+
+startSectionTimer({{ section.duration | default(10, true) | int }});
+
+
+let isFormDirty = true;
+window.onbeforeunload = function (e) {
+  if (isFormDirty) {
+    return "Are you sure you want to leave? Your response will be lost.";
+  }
+};
+document.querySelector("form")?.addEventListener("submit", () => {
+  isFormDirty = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.gradient-bg {
+    background: linear-gradient(to bottom right, #e4edff, #f5dfff);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    color: #6f3edb;
+    font-size: 2.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.subtitle {
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.question {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.sentence {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.blank {
+    padding: 8px 14px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1.5px solid #ccc;
+    margin: 0 6px;
+    width: 150px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.hint-btn, .check-btn {
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.hint-btn {
+    background-color: #f5f0ff;
+    color: #9c6be8;
+}
+
+.check-btn {
+    background: linear-gradient(to right, #8a64ff, #c84cff);
+    color: white;
+}
+
+.hint {
+    font-size: 0.95rem;
+    color: #9c6be8;
+    background-color: #f2e7ff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 15px;
+}

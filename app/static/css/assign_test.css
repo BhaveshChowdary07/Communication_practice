@@ -1,0 +1,178 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.assign-gradient {
+    background: linear-gradient(to bottom right, #e4edff, #f5dfff);
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #6f3edb;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.upload-card {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.upload-card label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.upload-card input[type="file"] {
+    padding: 10px;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+}
+
+.upload-card button {
+    background: linear-gradient(to right, #8a64ff, #c84cff);
+    color: white;
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.upload-card button:hover {
+    background: linear-gradient(to right, #a278ff, #e04dff);
+}
+
+.table-container {
+    background: white;
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+th {
+    background-color: #f0eaff;
+    color: #5e3ec9;
+}
+.student-preview {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.student-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.student-preview th,
+.student-preview td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.student-preview th {
+    background-color: #f0eaff;
+    color: #5e3ec9;
+}
+
+.test-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.test-summary ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.test-summary li {
+    padding: 6px 0;
+    font-size: 0.95rem;
+}
+.btn-success {
+    margin-top: 10px;
+    background: linear-gradient(to right, #6f3edb, #c84cff);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(110, 60, 230, 0.1);
+}
+
+.btn-success:hover {
+    background: linear-gradient(to right, #855ff1, #d76eff);
+}
+.date-col {
+    min-width: 260px;
+}
+
+.input-icon-wrapper {
+    position: relative;
+}
+
+.input-icon-wrapper input {
+    padding-right: 40px;
+}
+
+.icon-calendar {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-image: url("https://cdn-icons-png.flaticon.com/512/747/747310.png");
+    background-size: 20px 20px;
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+    opacity: 0.6;
+    pointer-events: none;
+}

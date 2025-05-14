@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grammar Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/grammar_split.css') }}" rel="stylesheet">
+</head>
+<body>
+<div class="gradient-bg">
+    <div class="container">
+        <div class="row g-4 align-items-stretch grammar-box">
+            <!-- LEFT: Instructions + Previous -->
+            <div class="col-md-6 left-box">
+                <h2 class="mb-3">Grammar</h2>
+                <div class="instruction-box">
+                    <h6>Question Instructions</h6>
+                    <p class="text-muted">Fill in the blank with the correct form of the word.</p>
+                </div>
+                <button class="btn btn-outline-secondary mt-4">← Previous</button>
+            </div>
+
+            <!-- RIGHT: Question + Input + Next -->
+            <div class="col-md-6 right-box">
+                <div class="question-box">
+                    <h6 class="text-secondary mb-2">Question</h6>
+                    <p class="mb-3">She <input type="text" class="blank" placeholder="Type here"> to school every day.</p>
+                </div>
+                <button class="btn btn-primary mt-2">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

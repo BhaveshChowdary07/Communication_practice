@@ -1,0 +1,96 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard-gradient {
+    background: linear-gradient(to bottom right, #e4edff, #f5dfff);
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-title {
+    font-size: 2.2rem;
+    color: #6f3edb;
+}
+
+.btn-create-test {
+    background: linear-gradient(to right, #8a64ff, #c84cff);
+    color: white;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.test-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transition: 0.2s ease;
+}
+
+.test-card h4 {
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.test-card p {
+    font-size: 0.9rem;
+    margin: 4px 0;
+    color: #555;
+}
+
+.actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-assign {
+    background-color: #8a64ff;
+    color: white;
+}
+
+.btn-assign:hover {
+    background-color: #6f3edb;
+}
+
+.btn-delete {
+    background-color: #ff4f70;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #e23c5c;
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/assign_test.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="assign-gradient">
+        <div class="container">
+            <h1 class="page-title">Assign Test to Students</h1>
+            <p class="subtitle">Upload a CSV file with <code>name, email</code> columns.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
+            <!-- Upload CSV Form -->
+            <form method="POST" enctype="multipart/form-data" class="upload-card">
+                <label for="csv_file">Upload CSV File</label>
+                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+                <button type="submit">Upload & Preview</button>
+            </form>
+
+            {% if test %}
+            <!-- Test Summary -->
+            <div class="test-summary mt-5">
+                <h4>Test Summary</h4>
+                <ul>
+                    <li><strong>Name:</strong> {{ test.test_name }}</li>
+                    <li><strong>Start:</strong> {{ test.start_date.strftime('%Y-%m-%d %H:%M') }}</li>
+                    <li><strong>End:</strong> {{ test.end_date.strftime('%Y-%m-%d %H:%M') }}</li>
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if csv_data %}
+            <!-- CSV Preview Table -->
+            <div class="table-container mt-5">
+                <h4>CSV Preview</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            {% for header in csv_data[0].keys() %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in csv_data %}
+                        <tr>
+                            {% for value in row.values() %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Confirm Form: Only Shown When CSV Exists -->
+            <form method="POST">
+                <input type="hidden" name="confirm" value="true">
+                <button class="btn btn-success mt-4" type="submit">Confirm & Assign Test</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

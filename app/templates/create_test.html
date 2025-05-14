@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/create_test.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="create-gradient">
+        <div class="container">
+            <h1 class="page-title">Create New Test</h1>
+
+            <form method="POST" class="test-card">
+                <label>Test Name</label>
+                <input type="text" name="test_name" placeholder="Enter test name" required>
+
+                <div class="row">
+                    <div class="col date-col">
+                        <label for="start_date">Start Date & Time</label>
+                        <input type="datetime-local" name="start_date" id="start_date" required>
+                    </div>
+                    <div class="col date-col">
+                        <label for="end_date">End Date & Time</label>
+                        <input type="datetime-local" name="end_date" id="end_date" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Total Test Duration (mins)</label>
+                        <input type="number" name="test_duration" placeholder="e.g. 90" required>
+                    </div>
+                </div>
+
+                <h4>Select Sections</h4>
+                <div class="section-grid">
+                    {% for section in sections %}
+                    <div class="section-card">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="sections[]" value="{{ section.id }}" id="section{{ section.id }}">
+                            <label class="form-check-label" for="section{{ section.id }}">
+                                <strong>{{ section.name }}</strong>
+                                <p class="text-muted">{{ section.description }}</p>
+                            </label>
+                        </div>
+                        <label>Number of Questions</label>
+                        <input type="number" name="num_questions[]" min="1" placeholder="e.g. 5">
+                        <label>Section Duration (mins)</label>
+                        <input type="number" name="section_durations[]" min="1" placeholder="e.g. 10">
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn-create">Create Test</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

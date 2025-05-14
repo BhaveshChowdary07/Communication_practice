@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/admin_dashboard.css') }}" rel="stylesheet">
+</head>
+<body>
+  <div class="dashboard-gradient">
+    <div class="container">
+      <div class="header-row">
+        <h1 class="dashboard-title">Admin Dashboard</h1>
+        <a href="{{ url_for('admin_routes.create_test') }}" class="btn-create-test">+ Create Test</a>
+      </div>
+
+      <div class="test-grid">
+        {% for test in tests %}
+        <div class="test-card">
+          <h4>{{ test.test_name }}</h4>
+          <p><strong>Start:</strong> {{ test.start_date.strftime("%Y-%m-%d %H:%M") }}</p>
+          <p><strong>End:</strong> {{ test.end_date.strftime("%Y-%m-%d %H:%M") }}</p>
+          <div class="actions">
+            <a href="{{ url_for('admin_routes.assign_test', test_id=test.id) }}" class="btn btn-assign">Assign</a>
+            <form action="{{ url_for('admin_routes.delete_test', test_id=test.id) }}" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-delete">Delete</button>
+            </form>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
