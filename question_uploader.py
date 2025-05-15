@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 # === CONFIG ===
 engine = create_engine("mysql+pymysql://admin2:admin234@localhost/comm_test_db")
@@ -10,50 +10,64 @@ passage_df = pd.read_excel("Passage_Comprehension_Updated (9).xlsx")
 short_stories_df.fillna('', inplace=True)
 passage_df.fillna('', inplace=True)
 
-# Prepare short stories (section_id = 2)
-short_rows = []
-for _, row in short_stories_df.iterrows():
-    passage = row["short story"]
-    for i in range(1, 4):
-        q = row.get(f"Question {i}", "").strip()
-        if not q:
-            continue
-        short_rows.append({
+with engine.begin() as conn:
+    # === SHORT STORIES (Section ID 2) ===
+    for _, row in short_stories_df.iterrows():
+        passage = row["short story"]
+
+        # Insert into section_questions
+        insert_question = text("""
+            INSERT INTO section_questions (section_id, question_text, is_text_input, is_audio_input)
+            VALUES (:section_id, :question_text, 0, 0)
+        """)
+        result = conn.execute(insert_question, {
             "section_id": 2,
-            "passage_text": passage,
-            "question_text": q,
-            "option_a": row.get(f"Option {i}A", ""),
-            "option_b": row.get(f"Option {i}B", ""),
-            "option_c": row.get(f"Option {i}C", ""),
-            "option_d": row.get(f"Option {i}D", ""),
-            "correct_option": row.get(f"Correct Answer {i}", "").strip()[-1:],
-            "is_text_input": 0,
-            "is_audio_input": 0
+            "question_text": passage
         })
+        section_question_id = result.lastrowid
 
-# Prepare passage comprehension (section_id = 5)
-passage_rows = []
-for _, row in passage_df.iterrows():
-    passage = row["Passage Text"]
-    for i in range(1, 4):
-        q = row.get(f"Question {i}", "").strip()
-        if not q:
-            continue
-        passage_rows.append({
+        # Insert 3 MCQs
+        for i in range(1, 4):
+            q = row.get(f"Question {i}", "").strip()
+            if not q:
+                continue
+
+            insert_sub = text("""
+                INSERT INTO mcq_subquestions (section_question_id, question_text, option_a, option_b, option_c, option_d, correct_option)
+                VALUES (:sqid, :qtext, :a, :b, :c, :d, :correct)
+            """)
+            conn.execute(insert_sub, {
+                "sqid": section_question_id,
+                "qtext": q,
+                "a": row.get(f"Option {i}A", ""),
+                "b": row.get(f"Option {i}B", ""),
+                "c": row.get(f"Option {i}C", ""),
+                "d": row.get(f"Option {i}D", ""),
+                "correct": row.get(f"Correct Answer {i}", "").strip()[-1:].upper()
+            })
+
+    # === READING COMPREHENSION (Section ID 5) ===
+    for _, row in passage_df.iterrows():
+        passage = row["Passage Text"]
+
+        result = conn.execute(insert_question, {
             "section_id": 5,
-            "passage_text": passage,
-            "question_text": q,
-            "option_a": row.get(f"Option {i}A", ""),
-            "option_b": row.get(f"Option {i}B", ""),
-            "option_c": row.get(f"Option {i}C", ""),
-            "option_d": row.get(f"Option {i}D", ""),
-            "correct_option": row.get(f"Correct Answer {i}", "").strip()[-1:],
-            "is_text_input": 0,
-            "is_audio_input": 0
+            "question_text": passage
         })
+        section_question_id = result.lastrowid
 
-# Insert into DB
-pd.DataFrame(short_rows).to_sql("section_questions", con=engine, if_exists="append", index=False)
-pd.DataFrame(passage_rows).to_sql("section_questions", con=engine, if_exists="append", index=False)
+        for i in range(1, 4):
+            q = row.get(f"Question {i}", "").strip()
+            if not q:
+                continue
+            conn.execute(insert_sub, {
+                "sqid": section_question_id,
+                "qtext": q,
+                "a": row.get(f"Option {i}A", ""),
+                "b": row.get(f"Option {i}B", ""),
+                "c": row.get(f"Option {i}C", ""),
+                "d": row.get(f"Option {i}D", ""),
+                "correct": row.get(f"Correct Answer {i}", "").strip()[-1:].upper()
+            })
 
-print(f"✅ Inserted {len(short_rows)} short story MCQs and {len(passage_rows)} passage MCQs.")
+print("✅ Inserted short stories and reading comprehension questions.")

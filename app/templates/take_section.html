@@ -49,27 +49,28 @@
         <div class="instruction-box">
           <h5 class="fw-semibold">Instructions</h5>
           <ul>
-            {% if section.type == 'grammar' %}
-              <li>Fill in the blank appropriately.</li>
-            {% elif section.type == 'sentence_repeating' %}
-              <li>Click 'Play Audio' to listen.</li>
-              <li>Repeat the sentence aloud and record it.</li>
-            {% elif section.type == 'sentence_reading' %}
-              <li>Read the sentence aloud and record it.</li>
-            {% elif section.type == 'just_a_minute' %}
-              <li>Listen to the topic and speak for 30–45 seconds.</li>
-            {% elif section.type == 'essay_writing' %}
-              <li>Write a thoughtful essay based on the prompt.</li>
-            {% elif section.type == 'jumbled_sentences' %}
-              <li>Listen to the audio and arrange the parts into the correct order.</li>
-            {% elif section.type == 'story_retelling' %}
-              <li>Listen to the story and retell it in your own words via audio.</li>
-            {% elif section.type == 'short_stories' %}
-              <li>Read the story and answer the MCQs below.</li>
-            {% elif section.type == 'passage_comprehension' %}
-              <li>Read the passage carefully and choose the correct answers.</li>
-            {% endif %}
-          </ul>
+  {% if section.type == 'grammar' %}
+    <li>Fill in the blank appropriately.</li>
+  {% elif section.type == 'sentence_repeating' %}
+    <li>Click 'Play Audio' to listen.</li>
+    <li>Repeat the sentence aloud and record it.</li>
+  {% elif section.type == 'sentence_reading' %}
+    <li>Read the sentence aloud and record it.</li>
+  {% elif section.type == 'just_a_minute' %}
+    <li>Listen to the topic and speak for 30–45 seconds.</li>
+  {% elif section.type == 'essay_writing' %}
+    <li>Write a thoughtful essay based on the prompt.</li>
+  {% elif section.type == 'jumbled_sentences' %}
+    <li>Listen to the jumbled sentence and say the correct version aloud.</li>
+  {% elif section.type == 'story_retelling' %}
+    <li>Listen to the story and retell it in your own words via audio.</li>
+  {% elif section.type == 'short_stories' %}
+    <li>Read the story and answer the MCQs below.</li>
+  {% elif section.type == 'reading_comprehension' %}
+    <li>Read the passage carefully and choose the correct answers.</li>
+  {% endif %}
+</ul>
+
         </div>
 
         <!-- Question Box -->
@@ -85,14 +86,14 @@
             {% include 'just_a_minute.html' %}
           {% elif section.type == 'essay_writing' %}
             {% include 'essay.html' %}
-          {% elif section.type == 'jumbled_sentences' %}
-            {% include 'jumbled_sentences.html' %}
-          {% elif section.type == 'story_retelling' %}
-            {% include 'story_retelling.html' %}
           {% elif section.type == 'short_stories' %}
             {% include 'short_stories.html' %}
           {% elif section.type == 'reading_comprehension' %}
             {% include 'reading_comprehension.html' %}
+          {% elif section.type == 'jumbled_sentences' %}
+            {% include 'jumbled_sentences.html' %}
+          {% elif section.type == 'story_retelling' %}
+            {% include 'story_retelling.html' %}
           {% endif %}
         </div>
       </div>

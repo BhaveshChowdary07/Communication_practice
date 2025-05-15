@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash
 from io import BytesIO
 from random import sample, shuffle
 import sys
-
+from sqlalchemy import text
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app import db
 from app.models import User, StudentTestMap, Test, Section, SectionQuestion
@@ -122,9 +122,32 @@ def take_section(section_id):
         q3 = sample(model3, min(len(model3), remaining))
         questions = q1 + q2 + q3
         shuffle(questions)
-    else:
+
+    elif section.type in ['short_stories', 'reading_comprehension']:
         questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
 
+        for q in questions:
+            subquestions = db.session.execute(
+                text("SELECT * FROM mcq_subquestions WHERE section_question_id = :id LIMIT 3"),
+                {"id": q.id}
+            ).mappings().all()
+            q.subquestions = [{
+                'question': sq['question_text'],
+                'option_a': sq['option_a'],
+                'option_b': sq['option_b'],
+                'option_c': sq['option_c'],
+                'option_d': sq['option_d']
+        } for sq in subquestions]
+
+
+    elif section.type in ['jumbled_sentences', 'story_retelling']:
+        questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
+
+    else:
+        # Sentence Repeating, Sentence Reading, JAM, Essay
+        questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
+
+    # Navigation logic
     current_index = 0
     if request.method == 'POST':
         try:
