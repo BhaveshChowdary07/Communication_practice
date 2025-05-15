@@ -1,0 +1,31 @@
+.story-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.story-label {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.story-box {
+  background-color: #f1f0ff;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4a4a4a;
+  white-space: pre-wrap;
+}
+
+.form-check-input:checked {
+  background-color: #7b2ff7;
+  border-color: #7b2ff7;
+}
+
+.form-check-label {
+  cursor: pointer;
+}

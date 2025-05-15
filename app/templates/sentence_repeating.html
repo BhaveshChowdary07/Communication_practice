@@ -1,11 +1,15 @@
 
 {% if section.type == 'sentence_repeating' %}
-<div class="container" style="max-width: 760px;">
-  <p class="text-muted mb-3">Listen to the sentence and repeat it aloud.</p>
-  <button type="button" class="btn btn-outline-primary mb-3" onclick="document.getElementById('audio{{ q.id }}').play()">▶ Play Audio</button>
-  <audio id="audio{{ q.id }}" style="display: none;">
-    <source src="{{ url_for('student_routes.get_question_audio', question_id=q.id) }}" type="audio/mpeg">
-  </audio>
-  <button type="button" class="btn gradient-record-btn mt-3" onclick="toggleRecording('{{ q.id }}', this)">🎤 Record Audio</button>
+<div class="audio-section">
+  <h6 class="audio-label">Listen to the sentence:</h6>
+  <button type="button" class="btn play-audio-btn" onclick="playAudio({{ q.id }})">
+    ▶️ Play Audio
+  </button>
+
+  <h6 class="audio-label mt-4">Record your response:</h6>
+  <button type="button" class="btn record-btn" onclick="toggleRecording({{ q.id }}, this)">
+    🎙️ Start Recording
+  </button>
 </div>
+
 {% endif %}

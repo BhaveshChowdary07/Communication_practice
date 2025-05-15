@@ -1,0 +1,14 @@
+{% if section.type == 'story_retelling' %}
+<div class="story-retell-section">
+  <h6 class="audio-label">Listen to the story:</h6>
+  <button type="button" class="btn play-audio-btn mb-4" onclick="playAudio({{ q.id }})">
+    ▶️ Play Audio
+  </button>
+
+  <h6 class="audio-label">Retell the story in your own words:</h6>
+  <button type="button" class="btn record-btn" onclick="toggleRecording({{ q.id }}, this)">
+    🎙️ Start Recording
+  </button>
+</div>
+
+{% endif %}

@@ -1,0 +1,13 @@
+{% if section.type == 'jumbled_sentences' %}
+<div class="jumbled-audio-section">
+  <h6 class="audio-label">Listen to the jumbled sentence:</h6>
+  <button type="button" class="btn play-audio-btn mb-4" onclick="playAudio({{ q.id }})">
+    ▶️ Play Audio
+  </button>
+
+  <h6 class="audio-label">Now say the correct sentence:</h6>
+  <button type="button" class="btn record-btn" onclick="toggleRecording({{ q.id }}, this)">
+    🎙️ Start Recording
+  </button>
+</div>
+{% endif %}

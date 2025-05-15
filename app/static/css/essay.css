@@ -1,65 +1,36 @@
-.essay-wrapper {
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.essay-instruction {
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 20px;
-  color: #555;
-}
-
-.essay-topic-box {
-  background: #f4edfc;
-  border: 1px solid #d6c1f5;
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  font-size: 15px;
-}
-
-.topic-label {
-  font-weight: 600;
-  color: #7c3aed;
-  margin-right: 4px;
-}
-
-.essay-response-box textarea.essay-textarea {
-  border-radius: 10px;
-  border: 2px solid #cad5e2;
-  padding: 15px;
-  font-size: 15px;
-  resize: vertical;
-}
-
-.btn-submit-essay {
-  background: linear-gradient(to right, #4f46e5, #7c3aed);
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 10px;
-  width: 100%;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.btn-submit-essay:disabled {
-  background: #d1d5db;
-  cursor: not-allowed;
-}
-.card1 {
+.essay-section {
   background: white;
-  border-radius: 16px;
-  padding: 30px;
-  max-width: 1024px;
-  margin: 0 auto;               /* centers the card horizontally */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.essay-label {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.essay-prompt {
+  background-color: #f1f0ff;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+.essay-textarea {
+  border-radius: 10px;
+  border: 2px solid #c7b6ff;
+  font-size: 1rem;
+  padding: 10px 12px;
+  resize: vertical;
+  transition: border-color 0.3s;
+}
+
+.essay-textarea:focus {
+  outline: none;
+  border-color: #7b2ff7;
+  box-shadow: 0 0 0 3px rgba(123, 47, 247, 0.2);
 }

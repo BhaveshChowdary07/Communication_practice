@@ -1,8 +1,15 @@
 
 {% if section.type == 'sentence_reading' %}
-<div class="container" style="max-width: 760px;">
-  <p class="text-muted mb-3">Read the sentence aloud and record your response.</p>
-  <div class="sentence-box p-3 bg-light border mb-3">{{ q.question_text }}</div>
-  <button type="button" class="btn gradient-record-btn" onclick="toggleRecording('{{ q.id }}', this)">🎤 Record Audio</button>
+<div class="reading-section">
+  <h6 class="audio-label">Read the sentence when ready:</h6>
+  <div class="sentence-box">
+    {{ q.question_text }}
+  </div>
+
+  <h6 class="audio-label mt-4">Record your response:</h6>
+  <button type="button" class="btn record-btn" onclick="toggleRecording({{ q.id }}, this)">
+    🎙️ Start Recording
+  </button>
 </div>
+
 {% endif %}

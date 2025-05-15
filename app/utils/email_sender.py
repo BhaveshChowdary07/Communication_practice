@@ -1,41 +1,31 @@
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from flask import url_for
+import requests
 
-# --- TEMPORARY GMAIL SMTP CONFIG ---
-GMAIL_USER = 'sreebhavesh7@gmail.com'
-GMAIL_PASS = 'dwab bxay jojt naho'
+EMAIL_API_URL = "https://submissions.azurewebsites.net/api/sendEmail"
 
 def send_credentials(email, password, test_id):
     subject = "Your Communication Test Login"
     body = f"""
-Hello,
-
-You have been assigned a communication test.
-
-Login Email: {email}
-Password: {password}
-Test ID: {test_id}
-
-You can log in to take the test at: http://127.0.0.1:5000/student/login
-
-Thanks,
-Test Platform Team
+Hello,<br><br>
+You have been assigned a communication test.<br><br>
+<b>Login Email:</b> {email}<br>
+<b>Password:</b> {password}<br>
+<b>Test ID:</b> {test_id}<br><br>
+You can log in to take the test at: <a href="http://127.0.0.1:5000/student/login">Click here to login</a><br><br>
+Thanks,<br>
+<b>Test Platform Team</b>
 """
 
-    msg = MIMEMultipart()
-    msg['From'] = GMAIL_USER
-    msg['To'] = email
-    msg['Subject'] = subject
+    payload = {
+        "to": email,
+        "subject": subject,
+        "body": body
+    }
 
-    msg.attach(MIMEText(body, 'plain'))
+    headers = {
+        "Content-Type": "application/json"
+    }
 
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(GMAIL_USER, GMAIL_PASS)
-        server.send_message(msg)
-        server.quit()
-    except Exception as e:
-        raise Exception(f"Failed to send email to {email}: {str(e)}")
+    response = requests.post(EMAIL_API_URL, json=payload, headers=headers)
+
+    if response.status_code != 200:
+        raise Exception(f"Failed to send email to {email}. Status: {response.status_code}, Response: {response.text}")

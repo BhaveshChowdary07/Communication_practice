@@ -1,31 +1,18 @@
 
 {% if section.type == 'essay_writing' %}
-<div class="container" style="max-width: 960px;">
-  <div class="card1 p-4 shadow-sm">
-    <!-- <h3 class="fw-bold text-center mb-1">Essay Writing</h3>
-    <p class="text-center text-muted mb-4">Write an essay on the topic.</p> -->
+<div class="essay-section">
+  <h6 class="essay-label">Write your response to the following prompt:</h6>
+  <div class="essay-prompt mb-3">
+    {{ q.question_text }}
+  </div>
 
-    <div class="bg-light border rounded p-3 mb-4">
-      <span class="fw-semibold text-purple">📄 Topic:</span>
-      <span>{{ q.question_text }}</span>
-    </div>
+  <textarea class="form-control essay-textarea" name="essay_answer_{{ q.id }}"
+            rows="10" maxlength="1000" placeholder="Start typing here..."
+            oninput="updateCharCount(this)"></textarea>
 
-    <label class="form-label fw-semibold">Your Response (max 1000 characters)</label>
-    <textarea 
-      id="essay-input" 
-      name="essay_response_{{ q.id }}" 
-      class="form-control" 
-      rows="10" 
-      maxlength="1000" 
-      placeholder="Write your essay here..." 
-      oninput="updateCharCount(this)">
-    </textarea>
-
-    <div class="text-muted mt-1" id="char-count">Characters: 0/1000</div>
-
-    <button type="submit" name="submit" value="1" class="btn btn-primary mt-4 w-100" id="submit-btn" disabled>
-      🚀 Submit Essay
-    </button>
+  <div class="text-end mt-2 text-muted">
+    <span id="char-count">Characters: 0 / 1000</span>
   </div>
 </div>
+
 {% endif %}

@@ -120,31 +120,40 @@ def assign_test(test_id):
             for _, row in df.iterrows():
                 name = row['name']
                 email = row['email']
+
                 student = User.query.filter_by(email=email, role='student').first()
 
                 if not student:
-                    password = secrets.token_urlsafe(6)
-                    hashed_pw = generate_password_hash(password)
+                    # Generate new password
+                    password_plain = secrets.token_urlsafe(6)
+                    hashed_pw = generate_password_hash(password_plain)
                     student = User(name=name, email=email, password=hashed_pw, role='student')
                     db.session.add(student)
                     db.session.flush()
                 else:
-                    password = None
+                    # Reuse old password if available from any previous assignment
+                    existing_map_any = StudentTestMap.query.filter_by(student_id=student.id).first()
+                    if existing_map_any and existing_map_any.password:
+                        password_plain = existing_map_any.password
+                    else:
+                        password_plain = secrets.token_urlsafe(6)
+                        student.password = generate_password_hash(password_plain)
 
+                # Assign test if not already done
                 existing_map = StudentTestMap.query.filter_by(student_id=student.id, test_id=test_id).first()
                 if not existing_map:
-                    map_password = secrets.token_urlsafe(6) if password is None else password
                     map_entry = StudentTestMap(
                         student_id=student.id,
                         test_id=test_id,
-                        password=map_password
+                        password=password_plain
                     )
                     db.session.add(map_entry)
 
-                    send_credentials(email=email, password=map_password, test_id=test_id)
+                # ✅ Send email with reused/generated password
+                send_credentials(email=email, password=password_plain, test_id=test_id)
 
             db.session.commit()
-            flash("Students assigned and emails sent!", "success")
+            flash("Students assigned and credentials sent!", "success")
             return redirect(url_for('admin_routes.dashboard'))
 
         else:
@@ -159,6 +168,7 @@ def assign_test(test_id):
             flash("Preview the test and students below. Click 'Confirm & Assign Test' to continue.", "info")
 
     return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data)
+
 
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
