@@ -1,40 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Grammar Practice</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/grammar.css') }}" rel="stylesheet">
-</head>
-<body>
-    <div class="gradient-bg">
-        <div class="container">
-            <h1>Grammar Practice</h1>
-            <p class="subtitle">Fill in the blanks with the correct form of the words</p>
 
-            <div class="card">
-                <label class="question">Fill in the blank:</label>
-                <div class="sentence">
-                    I 
-                    <input type="text" class="blank" placeholder="Type here"> 
-                    (just/arrive) at the hotel.
-                </div>
-
-                <div class="actions">
-                    <button class="hint-btn" onclick="toggleHint()">💡 Show Hint</button>
-                    <button class="check-btn">Check Answer</button>
-                </div>
-
-                <p class="hint" id="hint-text" style="display: none;">Hint: Present perfect tense (recent action)</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function toggleHint() {
-            const hint = document.getElementById("hint-text");
-            hint.style.display = hint.style.display === "none" ? "block" : "none";
-        }
-    </script>
-</body>
-</html>
+{% if section.type == 'grammar' %}
+<div class="container" style="max-width: 760px;">
+  <p class="text-muted mb-2">Fill in the blank appropriately:</p>
+  <p>{{ q.question_text | safe }}</p>
+  <input type="text" name="grammar_answer_{{ q.id }}" class="form-control my-3" placeholder="Type your answer...">
+</div>
+{% endif %}

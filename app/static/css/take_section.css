@@ -1,0 +1,80 @@
+.gradient-record-btn {
+  background:radial-gradient( circle farthest-corner at 10% 20%,  rgba(235,183,241,1) 17.3%, rgba(228,145,235,1) 90% );
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.gradient-record-btn:hover {
+  background:radial-gradient( circle farthest-corner at 10% 20%,  rgba(236,158,248,1) 0%,  rgba(228,145,235,1) 92.1% );
+}
+
+.gradient-next-btn {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.gradient-next-btn:hover {
+  background: linear-gradient(to right, #3c9bf8, #00dbf5);
+}
+
+.gradient-submit-btn {
+  background: linear-gradient(to right, #43e97b, #38f9d7);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.gradient-submit-btn:hover {
+  background: linear-gradient(to right, #30d95d, #27e0c6);
+}
+
+.gradient-prev-btn {
+  background: linear-gradient(to right, #b19cd9, #8e2de2);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.gradient-prev-btn:hover {
+  background: linear-gradient(to right, #a78dd6, #702ccf);
+}
+
+.gradient-play-btn {
+  background:linear-gradient( 109.6deg,  rgba(75,228,255,1) 11.2%, rgba(188,204,251,1) 100.6% );
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.gradient-play-btn:hover {
+  background:linear-gradient( 109.6deg,  rgba(75,228,255,1) 11.2%, rgba(188,204,251,1) 98.6% );
+}
+/* Align instruction list */
+.instruction-box ul {
+  text-align: left;
+  padding-left: 20px;
+  list-style-position: inside;
+}

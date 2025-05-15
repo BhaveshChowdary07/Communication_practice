@@ -1,5 +1,4 @@
-# __init__.py (updated)
-from flask import Flask
+from flask import Flask, render_template 
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 
@@ -16,3 +15,7 @@ app.register_blueprint(student_routes.bp)
 
 import base64
 app.jinja_env.filters['b64encode'] = lambda data: base64.b64encode(data).decode('utf-8') if data else ''
+
+@app.route('/')
+def home():
+    return render_template('home.html')

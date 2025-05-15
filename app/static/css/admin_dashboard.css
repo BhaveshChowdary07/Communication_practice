@@ -89,8 +89,10 @@ body, html {
 .btn-delete {
     background-color: #ff4f70;
     color: white;
+    border-color: #ff4f70;
 }
 
 .btn-delete:hover {
     background-color: #e23c5c;
+    border-color: #e23c5c;
 }

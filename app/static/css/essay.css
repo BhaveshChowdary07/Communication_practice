@@ -1,106 +1,65 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
+.essay-wrapper {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.gradient-bg {
-    background: linear-gradient(to bottom right, #e9f0ff, #ffe3f6);
-    min-height: 100vh;
-    padding: 60px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+.essay-instruction {
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #555;
 }
 
-.container {
-    max-width: 800px;
-    width: 100%;
-    text-align: center;
-}
-
-h1 {
-    color: #7a3eff;
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
-}
-
-.subtitle {
-    color: #666;
-    font-size: 1rem;
-    margin-bottom: 2rem;
-}
-
-.card {
-    background: white;
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    text-align: left;
+.essay-topic-box {
+  background: #f4edfc;
+  border: 1px solid #d6c1f5;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  font-size: 15px;
 }
 
 .topic-label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #999;
-    margin-bottom: 4px;
+  font-weight: 600;
+  color: #7c3aed;
+  margin-right: 4px;
 }
 
-.topic-text {
-    font-size: 1.1rem;
-    color: #333;
-    margin-bottom: 20px;
-    background-color: #f7f4ff;
-    padding: 12px 18px;
-    border-radius: 12px;
+.essay-response-box textarea.essay-textarea {
+  border-radius: 10px;
+  border: 2px solid #cad5e2;
+  padding: 15px;
+  font-size: 15px;
+  resize: vertical;
 }
 
-.response-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #444;
+.btn-submit-essay {
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
-.essay-box {
-    width: 100%;
-    min-height: 180px;
-    border: 1.8px solid #d6cfff;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 1rem;
-    resize: vertical;
-    margin-bottom: 20px;
-    outline: none;
-    background-color: #fafaff;
+.btn-submit-essay:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
 }
-
-.essay-box:focus {
-    border-color: #aa7cff;
-    box-shadow: 0 0 0 3px rgba(174, 123, 255, 0.2);
-}
-
-.submit-btn {
-    background: linear-gradient(to right, #8a64ff, #d264ff);
-    border: none;
-    padding: 12px 24px;
-    font-size: 1rem;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.submit-btn:hover {
-    background: linear-gradient(to right, #a171ff, #e37cff);
-}
-
-.topic-label {
-    color: #555;
-    font-size: 0.95rem;
-}
-
-.topic-text {
-    font-size: 1.05rem;
-    border-left: 4px solid #a173ff;
+.card1 {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 1024px;
+  margin: 0 auto;               /* centers the card horizontally */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }

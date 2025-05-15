@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.security import check_password_hash
 from io import BytesIO
 from random import sample, shuffle
+import sys
 
+from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app import db
 from app.models import User, StudentTestMap, Test, Section, SectionQuestion
-from app.utils.jwt_utils import generate_token, jwt_required
 
 bp = Blueprint('student_routes', __name__, url_prefix='/student')
 
@@ -14,6 +15,7 @@ def student_login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        print("Login POST hit for student:", email, file=sys.stderr)
 
         student = User.query.filter_by(email=email, role='student').first()
         if not student:
@@ -22,12 +24,15 @@ def student_login():
 
         test_map = StudentTestMap.query.filter_by(student_id=student.id).first()
         if not test_map or not check_password_hash(student.password, password):
-            flash("Incorrect password or no test assigned to this email.", "danger")
+            flash("Incorrect password or no test assigned.", "danger")
             return redirect(url_for('student_routes.student_login'))
 
-        token = generate_token(student.id, 'student')
+        access_token = generate_access_token(student.id, 'student')
+        refresh_token = generate_refresh_token(student.id)
+
         response = make_response(redirect(url_for('student_routes.dashboard')))
-        response.set_cookie('jwt_token', token, httponly=True, samesite='Lax')
+        response.set_cookie('jwt_token', access_token, httponly=True, samesite='Lax', max_age=3600)
+        response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', max_age=86400)
         return response
 
     return render_template("student_login.html")
@@ -36,6 +41,7 @@ def student_login():
 def logout():
     response = make_response(redirect(url_for('student_routes.student_login')))
     response.set_cookie('jwt_token', '', expires=0)
+    response.set_cookie('refresh_token', '', expires=0)
     return response
 
 @bp.route('/dashboard')
@@ -58,7 +64,6 @@ def dashboard():
             })
 
     return render_template("student_dashboard.html", tests=enriched_tests, student=student)
-
 
 @bp.route('/test/<int:test_id>')
 @jwt_required(role='student')
@@ -85,8 +90,7 @@ def test_sections(test_id):
 def take_section(section_id):
     student_id = request.user_id
 
-    # Validate test assignment
-    test_maps = StudentTestMap.query.filter_by(student_id=student_id).all()
+    test_maps = StudentTestMap.query.filter_by(student_id=student_id).order_by(StudentTestMap.assigned_date.desc()).all()
     matched_test = None
     for test_map in test_maps:
         test = Test.query.get(test_map.test_id)
@@ -99,14 +103,12 @@ def take_section(section_id):
         return redirect(url_for('student_routes.dashboard'))
 
     section = Section.query.get(section_id)
-
-    # Get question count
     section_ids = matched_test.sections.split(',')
     question_counts = matched_test.num_questions.split(',')
+
     index = section_ids.index(str(section_id))
     question_limit = int(question_counts[index])
 
-    # Fetch questions with grammar-safe sampling
     if section.type == 'grammar':
         all_questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(SectionQuestion.id).all()
         model1 = all_questions[0:50]
@@ -123,7 +125,6 @@ def take_section(section_id):
     else:
         questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
 
-    # Handle question index and navigation
     current_index = 0
     if request.method == 'POST':
         try:
@@ -149,3 +150,21 @@ def get_question_audio(question_id):
         return "Audio not found", 404
 
     return send_file(BytesIO(question.question_audio), mimetype='audio/mpeg')
+
+@bp.route('/refresh_token', methods=['POST'])
+def refresh_token():
+    token = request.cookies.get('refresh_token')
+    if not token:
+        return {"error": "Missing refresh token"}, 401
+
+    payload = decode_token(token)
+    if not payload or payload.get('type') != 'refresh':
+        return {"error": "Invalid or expired refresh token"}, 403
+
+    user_id = payload['sub']
+    role = 'student'
+    new_access = generate_access_token(user_id, role)
+
+    response = make_response({"message": "Token refreshed"})
+    response.set_cookie('jwt_token', new_access, httponly=True, samesite='Lax', max_age=3600)
+    return response

@@ -1,61 +1,57 @@
-body, html {
+body {
+  background: linear-gradient(135deg, #f2e7fe, #e0e7ff);
+  font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
-}
-
-.login-gradient {
-  background: linear-gradient(to bottom right, #dbeafe, #e0d4ff);
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.login-box {
+.login-wrapper {
+  width: 100%;
+  max-width: 420px;
+  padding: 0 15px;
+}
+
+.login-card {
   background: white;
-  padding: 30px;
+  padding: 40px 30px;
   border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  width: 360px;
-}
-
-h2 {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
   text-align: center;
-  color: #4f46e5;
-  margin-bottom: 24px;
 }
 
-label {
-  display: block;
-  margin-top: 16px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #444;
+.brand-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #6f42c1;
+  margin-bottom: 8px;
 }
 
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  margin-top: 6px;
+.subtext {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
 }
 
-button {
-  margin-top: 24px;
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  background: linear-gradient(to right, #6366f1, #a855f7);
-  color: white;
+.form-control {
+  height: 45px;
+  font-size: 14px;
+}
+
+.btn-login {
+  background: linear-gradient(to right, #7e5bef, #a388f0);
   border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.3s;
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  height: 45px;
+  margin-top: 10px;
+  transition: background 0.3s ease;
 }
 
-button:hover {
-  background: linear-gradient(to right, #818cf8, #c084fc);
+.btn-login:hover {
+  background: linear-gradient(to right, #6a4ccc, #8f6ce9);
 }

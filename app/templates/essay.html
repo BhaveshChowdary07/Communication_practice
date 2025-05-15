@@ -1,29 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Essay Writing</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/essay.css') }}" rel="stylesheet">
-</head>
-<body>
-<div class="gradient-bg">
-    <div class="container">
-        <h1>Essay Writing</h1>
-        <p class="subtitle">Read the topic carefully and express your opinion in 1000 characters</p>
 
-        {% for q in questions %}
-        <div class="card">
-            <div class="topic-label">Topic:</div>
-            <div class="topic-text">{{ q.question_text }}</div>
+{% if section.type == 'essay_writing' %}
+<div class="container" style="max-width: 960px;">
+  <div class="card1 p-4 shadow-sm">
+    <!-- <h3 class="fw-bold text-center mb-1">Essay Writing</h3>
+    <p class="text-center text-muted mb-4">Write an essay on the topic.</p> -->
 
-            <label class="response-label">Write your response below</label>
-            <textarea class="essay-box" name="essay_answer_{{ q.id }}" placeholder="Write your essay here..."></textarea>
-
-            <button type="submit" class="submit-btn">Submit</button>
-        </div>
-        {% endfor %}
+    <div class="bg-light border rounded p-3 mb-4">
+      <span class="fw-semibold text-purple">📄 Topic:</span>
+      <span>{{ q.question_text }}</span>
     </div>
+
+    <label class="form-label fw-semibold">Your Response (max 1000 characters)</label>
+    <textarea 
+      id="essay-input" 
+      name="essay_response_{{ q.id }}" 
+      class="form-control" 
+      rows="10" 
+      maxlength="1000" 
+      placeholder="Write your essay here..." 
+      oninput="updateCharCount(this)">
+    </textarea>
+
+    <div class="text-muted mt-1" id="char-count">Characters: 0/1000</div>
+
+    <button type="submit" name="submit" value="1" class="btn btn-primary mt-4 w-100" id="submit-btn" disabled>
+      🚀 Submit Essay
+    </button>
+  </div>
 </div>
-</body>
-</html>
+{% endif %}

@@ -1,0 +1,11 @@
+
+{% if section.type == 'just_a_minute' %}
+<div class="container" style="max-width: 760px;">
+  <p class="text-muted mb-3">Listen to the topic and speak continuously for 30–45 seconds.</p>
+  <button type="button" class="btn btn-outline-primary mb-3" onclick="document.getElementById('audio{{ q.id }}').play()">▶ Play Audio</button>
+  <audio id="audio{{ q.id }}" style="display: none;">
+    <source src="{{ url_for('student_routes.get_question_audio', question_id=q.id) }}" type="audio/mpeg">
+  </audio>
+  <button type="button" class="btn gradient-record-btn mt-3" onclick="toggleRecording('{{ q.id }}', this)">🎤 Record Audio</button>
+</div>
+{% endif %}
