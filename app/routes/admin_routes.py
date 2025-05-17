@@ -183,13 +183,13 @@ def assign_test(test_id):
 def add_shell_admin():
     from app.models import User
     from werkzeug.security import generate_password_hash
-    existing = User.query.filter_by(email="admin@example.com").first()
+    existing = User.query.filter_by(email="bhavesh.chowdary@redsage.global").first()
     if existing:
         return "Admin already exists."
 
     admin = User(
         name="Admin",
-        email="admin@example.com",
+        email="bhavesh.chowdary@redsage.global",
         role="admin",
         password=generate_password_hash("admin123")
     )
