@@ -1,146 +1,99 @@
-/* ============ GLOBAL ============ */
 body {
-  font-family: 'Inter', sans-serif;
-}
-
-.text-purple {
-  color: #7b2ff7;
+  font-family: 'Inter', sans-serif !important;
+  background-color: #f9fafb !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .gradient-bg {
-  background: linear-gradient(to bottom right, #e4edff, #f5dfff);
-  min-height: 100vh;
+  background-color: #f9fafb !important;
+  min-height: 100vh !important;
 }
 
-/* ============ SHARED CARDS ============ */
+/* Shared cards */
 .instruction-box,
 .interaction-box,
 .story-box,
 .scroll-mcq-box,
 .essay-answer-box {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background-color: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e5e7eb !important;
 }
 
-/* ============ TEXT ELEMENTS ============ */
+/* Story or passage */
 .story-text {
-  font-size: 1rem;
-  color: #333;
-  white-space: pre-wrap;
+  font-size: 1rem !important;
+  color: #111111 !important;
+  white-space: pre-wrap !important;
 }
 
 .instruction-box ul {
-  padding-left: 20px;
-  list-style-type: disc;
-  margin-bottom: 0;
+  padding-left: 20px !important;
+  list-style-type: disc !important;
+  margin-bottom: 0 !important;
 }
 
-/* ============ MCQ AREA ============ */
+/* MCQ options */
 .scroll-mcq-box {
-  max-height: 340px;
-  overflow-y: auto;
+  max-height: 340px !important;
+  overflow-y: auto !important;
 }
 
 .form-check {
-  margin-bottom: 10px;
+  margin-bottom: 10px !important;
 }
 
 .form-check-input:checked {
-  background-color: #6f42c1;
-  border-color: #6f42c1;
+  background-color: #111111 !important;
+  border-color: #111111 !important;
 }
 
-/* ============ INPUT STYLES ============ */
+/* Text areas and inputs */
 textarea,
 input[type="text"] {
-  border-radius: 8px;
-  font-size: 1rem;
-  padding: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  padding: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border: 1px solid #d1d5db !important;
+  background-color: #f9fafb !important;
+  color: #111111 !important;
 }
 
 textarea:focus,
 input[type="text"]:focus {
-  border-color: #a970ff;
-  box-shadow: 0 0 0 0.15rem rgba(123, 47, 247, 0.25);
-  outline: none;
+  border-color: #111111 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.1) !important;
 }
 
-/* ============ BUTTONS ============ */
-.gradient-record-btn {
-  background: linear-gradient(to right, #f66ec1, #f78baf);
-  color: white;
-  font-weight: 600;
-  border-radius: 10px;
-  border: none;
-  transition: 0.3s;
-}
-
-.gradient-play-btn {
-  background: linear-gradient(to right, #7b2ff7, #c084fc);
-  color: white;
-  font-weight: 600;
-  border-radius: 10px;
-  border: none;
-  transition: 0.3s;
-}
-
-.gradient-record-btn:hover,
-.gradient-play-btn:hover {
-  opacity: 0.9;
-}
-
-.gradient-prev-btn {
-  background: linear-gradient(to right, #b19cd9, #8e2de2);
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-}
-
-.gradient-prev-btn:hover {
-  background: linear-gradient(to right, #a78dd6, #702ccf);
-}
-
-.gradient-next-btn {
-  background: linear-gradient(to right, #4facfe, #00f2fe);
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-}
-
-.gradient-next-btn:hover {
-  background: linear-gradient(to right, #3c9bf8, #00dbf5);
-}
-
+/* Navigation buttons */
+.gradient-prev-btn,
+.gradient-next-btn,
 .gradient-submit-btn {
-  background: linear-gradient(to right, #43e97b, #38f9d7);
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-}
-.gradient-submit-btn:hover {
-  background: linear-gradient(to right, #30d95d, #27e0c6);
+  background-color: #111111 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  transition: background-color 0.2s ease-in-out !important;
 }
 
-/* ============ RESPONSIVE ============ */
+.gradient-prev-btn:hover,
+.gradient-next-btn:hover,
+.gradient-submit-btn:hover {
+  background-color: #000000 !important;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .d-flex.flex-wrap.gap-4 {
-    flex-direction: column;
+    flex-direction: column !important;
   }
 }

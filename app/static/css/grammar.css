@@ -1,17 +1,21 @@
 .text-purple {
-  color: #7b2ff7;
-}
-
-.form-control:focus {
-  border-color: #a970ff;
-  box-shadow: 0 0 0 0.15rem rgba(123, 47, 247, 0.25);
+  color: #111111 !important;
 }
 
 input::placeholder {
-  color: #999;
+  color: #9ca3af !important;
 }
 
 .form-control {
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #d1d5db !important;
+  color: #111111 !important;
+}
+
+.form-control:focus {
+  border-color: #111111 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.1) !important;
 }

@@ -1,32 +1,50 @@
-
 body {
-  background: linear-gradient(to bottom right, #e4edff, #f5dfff);
-  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb !important;
+  font-family: 'Inter', sans-serif !important;
 }
+
 .card-box {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  min-width: 320px;
-  max-width: 480px;
-  flex: 1 1 48%;
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+  min-width: 320px !important;
+  max-width: 480px !important;
+  flex: 1 1 48% !important;
+  border: 1px solid #e5e7eb !important;
 }
+
 .card-box h5, .card-box h6 {
-  font-size: 1.2rem;
+  font-size: 1.2rem !important;
+  color: #111111 !important;
 }
+
 .card-box ul, .card-box li {
-  font-size: 1.05rem;
+  font-size: 1.05rem !important;
+  color: #111111 !important;
 }
+
 .task-text {
-  font-size: 1.1rem;
-  font-weight: 500;
-  background: #f8f8ff;
-  border-radius: 10px;
-  padding: 14px;
-  border: 1px solid #e0e0f0;
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  background: #f9fafb !important;
+  border-radius: 10px !important;
+  padding: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  color: #111111 !important;
 }
+
 button {
-  font-size: 1.05rem;
-  padding: 10px 20px;
+  font-size: 1rem !important;
+  padding: 10px 20px !important;
+  background-color: #111111 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+button:hover {
+  background-color: #000000 !important;
 }

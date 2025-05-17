@@ -10,9 +10,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Email settings for Flask-Mail (example for Gmail SMTP)
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = 'sreebhavesh7@gmail.com'         # Replace with admin sender email
-    MAIL_PASSWORD = 'dwabbxayjojtnaho'          # Replace with app password
-    MAIL_DEFAULT_SENDER = 'sreebhavesh7@gmail.com'
+    # MAIL_SERVER = 'smtp.gmail.com'
+    # MAIL_PORT = 587
+    # MAIL_USE_TLS = True
+    # MAIL_USERNAME = 'sreebhavesh7@gmail.com'         # Replace with admin sender email
+    # MAIL_PASSWORD = 'dwabbxayjojtnaho'          # Replace with app password
+    # MAIL_DEFAULT_SENDER = 'sreebhavesh7@gmail.com'

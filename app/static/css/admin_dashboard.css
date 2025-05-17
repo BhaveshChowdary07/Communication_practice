@@ -1,123 +1,120 @@
 body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: 'Inter', sans-serif !important;
+  background-color: #f9fafb !important;
 }
 
 .dashboard-gradient {
-    background: linear-gradient(to bottom right, #e4edff, #f5dfff);
-    min-height: 100vh;
-    padding: 40px 20px;
+  background-color: #f9fafb !important;
+  min-height: 100vh !important;
+  padding: 40px 20px !important;
 }
 
 .container {
-    max-width: 1200px;
-    margin: auto;
+  max-width: 1200px !important;
+  margin: auto !important;
 }
 
 .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 30px !important;
 }
 
 .dashboard-title {
-    font-size: 2.2rem;
-    color: #6f3edb;
+  font-size: 2rem !important;
+  color: #111111 !important;
+  font-weight: 700 !important;
 }
 
 .btn-create-test {
-    background: linear-gradient(to right, #8a64ff, #c84cff);
-    color: white;
-    padding: 10px 18px;
-    font-size: 0.95rem;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 500;
+  background-color: #111111 !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  font-size: 1rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+.btn-create-test:hover {
+  background-color: #000000 !important;
 }
 
 .test-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 24px !important;
 }
 
 .test-card {
-    background: white;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    transition: 0.2s ease;
+  background: white !important;
+  padding: 24px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e5e7eb !important;
 }
 
 .test-card h4 {
-    margin-bottom: 10px;
-    color: #444;
+  margin-bottom: 8px !important;
+  color: #111111 !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
 }
 
 .test-card p {
-    font-size: 0.9rem;
-    margin: 4px 0;
-    color: #555;
+  font-size: 0.95rem !important;
+  color: #6b7280 !important;
+  margin: 0 !important;
 }
 
 .actions {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
+  margin-top: 16px !important;
+  display: flex !important;
+  gap: 10px !important;
 }
 
 .btn {
-    padding: 8px 14px ;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: 0.3s;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: 0.2s ease-in-out !important;
 }
 
 .btn-assign {
-  background-color: #8a64ff !important;
-  color: white !important;
-  padding: 8px 14px;
-  border-radius: 8px;
-  text-decoration: none !important;
-  display: inline-block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: 0.3s;
-}
-.btn-assign:hover {
-  background-color: #6f3edb !important;
+  background-color: #111111 !important;
   color: white !important;
 }
 
+.btn-assign:hover {
+  background-color: #000000 !important;
+}
 
 .btn-delete {
-    background-color: #ff4f70 !important;
-    color: white !important;
-    border-color: #ff4f70 !important;
-     padding: 8px 14px;
-    border-radius: 8px;
-    font-weight: 500;
-    text-decoration: none;
-    display: inline-block;
+  background-color: #e11d48 !important;
+  color: white !important;
 }
 
 .btn-delete:hover {
-    background-color: #e23c5c !important;
-    border-color: #e23c5c !important;
+  background-color: #be123c !important;
 }
+
 nav.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  background-color: white !important;
+  font-size: 0.95rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #111111 !important;
 }

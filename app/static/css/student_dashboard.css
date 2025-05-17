@@ -1,94 +1,100 @@
-/* student_dashboard.css */
-
 body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(to bottom right, #dbeafe, #e0d4ff);
-    min-height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: 'Inter', sans-serif !important;
+  background-color: #f9fafb !important;
+  min-height: 100vh !important;
 }
 
 .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 20px;
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  padding: 40px 20px !important;
 }
 
 .dashboard-title {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: #6b21a8;
-    margin-bottom: 30px;
+  text-align: center !important;
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: #111111 !important;
+  margin-bottom: 30px !important;
 }
 
 .test-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  gap: 24px !important;
 }
 
 .test-card {
-    background: white;
-    padding: 24px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  background: #ffffff !important;
+  padding: 24px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e5e7eb !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
 }
 
 .test-card h4 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: #4c1d95;
+  margin: 0 !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  color: #111111 !important;
 }
 
 .test-card p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #555;
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  color: #6b7280 !important;
 }
 
 .test-card .btn-start {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(to right, #8b5cf6, #a855f7);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-    text-align: center;
-    text-decoration: none;
+  padding: 10px 20px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background-color: #111111 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease-in-out !important;
+  text-align: center !important;
+  text-decoration: none !important;
 }
 
 .test-card .btn-start:hover {
-    background: linear-gradient(to right, #a78bfa, #c084fc);
+  background-color: #000000 !important;
 }
 
 .test-card .completed-label {
-    color: #10b981;
-    font-weight: 600;
-    margin-top: 10px;
+  color: #10b981 !important;
+  font-weight: 600 !important;
+  margin-top: 10px !important;
+}
+
+.navbar {
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: #ffffff !important;
+}
+
+.navbar-brand {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #111111 !important;
 }
 
 @media screen and (max-width: 600px) {
-    .dashboard-title {
-        font-size: 2rem;
-    }
+  .dashboard-title {
+    font-size: 2rem !important;
+  }
 
-    .test-card {
-        padding: 20px;
-    }
+  .test-card {
+    padding: 20px !important;
+  }
 
-    .test-card .btn-start {
-        font-size: 0.9rem;
-    }
-}
-.navbar {
-  border-bottom: 1px solid #eee;
-}
-.navbar-brand {
-  font-size: 1.5rem;
+  .test-card .btn-start {
+    font-size: 0.95rem !important;
+  }
 }
