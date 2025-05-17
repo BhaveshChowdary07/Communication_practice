@@ -44,7 +44,7 @@ class SectionQuestion(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
-    question_text = db.Column(db.Text, nullable=False)
+    question_text = db.Column(db.Text, nullable=True)
     question_audio = db.Column(db.LargeBinary)
     # Optional fields depending on your section types
     option_a = db.Column(db.Text)
