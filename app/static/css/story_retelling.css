@@ -1,45 +1,32 @@
-.story-retell-section {
-  background: white;
+
+body {
+  background: linear-gradient(to bottom right, #e4edff, #f5dfff);
+  font-family: 'Inter', sans-serif;
+}
+.card-box {
+  background: #fff;
   border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-width: 320px;
+  max-width: 480px;
+  flex: 1 1 48%;
 }
-
-.audio-label {
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #333;
+.card-box h5, .card-box h6 {
+  font-size: 1.2rem;
 }
-
-.play-audio-btn {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(to right, #7b2ff7, #c084fc);
-  border: none;
-  color: white;
+.card-box ul, .card-box li {
+  font-size: 1.05rem;
+}
+.task-text {
+  font-size: 1.1rem;
   font-weight: 500;
-  font-size: 1rem;
-  border-radius: 12px;
-  cursor: pointer;
+  background: #f8f8ff;
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid #e0e0f0;
 }
-
-.play-audio-btn:hover {
-  background: linear-gradient(to right, #5f1dcf, #a76df7);
-}
-
-.record-btn {
-  width: 100%;
-  padding: 12px;
-  background: #f8c5d4;
-  border: none;
-  color: #b40042;
-  font-weight: 500;
-  font-size: 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.record-btn.recording {
-  background: #f395af;
-  color: white;
+button {
+  font-size: 1.05rem;
+  padding: 10px 20px;
 }

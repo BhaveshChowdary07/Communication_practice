@@ -58,9 +58,21 @@ def dashboard():
         if test:
             section_ids = [int(sid) for sid in test.sections.split(',') if sid.strip()]
             sections = Section.query.filter(Section.id.in_(section_ids)).all()
+
+            # ✅ Track completion status per section
+            section_status = {}
+            for section in sections:
+                progress = StudentSectionProgress.query.filter_by(
+                    student_id=student_id,
+                    test_id=test.id,
+                    section_id=section.id
+                ).first()
+                section_status[section.id] = 'Completed' if progress and progress.submitted else 'Not Started'
+
             enriched_tests.append({
                 'test': test,
-                'sections': sections
+                'sections': sections,
+                'status': section_status
             })
 
     return render_template("student_dashboard.html", tests=enriched_tests, student=student)
@@ -85,11 +97,20 @@ def test_sections(test_id):
 
     return render_template("test_sections.html", test=test, sections=sections)
 
+from datetime import datetime, timedelta
+from sqlalchemy import text
+from random import sample, shuffle
+from app.models import (
+    User, Test, Section, SectionQuestion,
+    StudentTestMap, StudentSectionProgress
+)
+
 @bp.route('/section/<int:section_id>', methods=['GET', 'POST'])
 @jwt_required(role='student')
 def take_section(section_id):
     student_id = request.user_id
 
+    # Identify matched test
     test_maps = StudentTestMap.query.filter_by(student_id=student_id).order_by(StudentTestMap.assigned_date.desc()).all()
     matched_test = None
     for test_map in test_maps:
@@ -105,16 +126,45 @@ def take_section(section_id):
     section = Section.query.get(section_id)
     section_ids = matched_test.sections.split(',')
     question_counts = matched_test.num_questions.split(',')
+    section_durations = matched_test.section_durations.split(',')
 
-    index = section_ids.index(str(section_id))
-    question_limit = int(question_counts[index])
+    try:
+        index = section_ids.index(str(section_id))
+        question_limit = int(question_counts[index])
+        section_duration = int(section_durations[index])
+        print("DEBUG section_durations:", section_durations)
+        print("Parsed duration for section:", section_duration)
+    except ValueError:
+        flash("Section not configured correctly in test.", "danger")
+        return redirect(url_for('student_routes.dashboard'))
 
+    # Handle progress record and timer
+    progress = StudentSectionProgress.query.filter_by(
+        student_id=student_id,
+        test_id=matched_test.id,
+        section_id=section_id
+    ).first()
+
+    if not progress:
+        progress = StudentSectionProgress(
+            student_id=student_id,
+            test_id=matched_test.id,
+            section_id=section_id,
+            start_time=datetime.utcnow()
+        )
+        db.session.add(progress)
+        db.session.commit()
+
+    from pytz import utc
+
+    end_time = progress.start_time.replace(tzinfo=utc) + timedelta(minutes=section_duration)
+    end_timestamp = int(end_time.timestamp() * 1000)
+
+
+    # Fetch questions by type
     if section.type == 'grammar':
         all_questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(SectionQuestion.id).all()
-        model1 = all_questions[0:50]
-        model2 = all_questions[50:100]
-        model3 = all_questions[100:150]
-
+        model1, model2, model3 = all_questions[0:50], all_questions[50:100], all_questions[100:150]
         chunk = question_limit // 3
         q1 = sample(model1, min(chunk, len(model1)))
         q2 = sample(model2, min(chunk, len(model2)))
@@ -125,7 +175,6 @@ def take_section(section_id):
 
     elif section.type in ['short_stories', 'reading_comprehension']:
         questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
-
         for q in questions:
             subquestions = db.session.execute(
                 text("SELECT * FROM mcq_subquestions WHERE section_question_id = :id LIMIT 3"),
@@ -137,33 +186,39 @@ def take_section(section_id):
                 'option_b': sq['option_b'],
                 'option_c': sq['option_c'],
                 'option_d': sq['option_d']
-        } for sq in subquestions]
-
-
-    elif section.type in ['jumbled_sentences', 'story_retelling']:
-        questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
+            } for sq in subquestions]
 
     else:
-        # Sentence Repeating, Sentence Reading, JAM, Essay
         questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
 
-    # Navigation logic
+    # Navigation and submission logic
     current_index = 0
     if request.method == 'POST':
         try:
             current_index = int(request.form.get('current_index', 0))
-        except ValueError:
+            end_timestamp = int(request.form.get('end_timestamp'))
+        except (ValueError, TypeError):
             current_index = 0
+            end_timestamp = int(datetime.utcnow().timestamp() * 1000)  # fallback
 
         if 'next' in request.form:
             current_index = min(current_index + 1, len(questions) - 1)
         elif 'prev' in request.form:
             current_index = max(current_index - 1, 0)
         elif 'submit' in request.form:
+            progress.submitted = True
+            db.session.commit()
             flash("Section submitted!", "success")
             return redirect(url_for('student_routes.dashboard'))
 
-    return render_template("take_section.html", section=section, questions=questions, current_index=current_index)
+    return render_template("take_section.html",
+        section=section,
+        questions=questions,
+        current_index=current_index,
+        student=User.query.get(student_id),
+        end_timestamp=end_timestamp,
+        submitted=progress.submitted
+    )
 
 @bp.route('/audio/<int:question_id>')
 @jwt_required(role='student')

@@ -1,5 +1,101 @@
+/* ============ GLOBAL ============ */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.text-purple {
+  color: #7b2ff7;
+}
+
+.gradient-bg {
+  background: linear-gradient(to bottom right, #e4edff, #f5dfff);
+  min-height: 100vh;
+}
+
+/* ============ SHARED CARDS ============ */
+.instruction-box,
+.interaction-box,
+.story-box,
+.scroll-mcq-box,
+.essay-answer-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* ============ TEXT ELEMENTS ============ */
+.story-text {
+  font-size: 1rem;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.instruction-box ul {
+  padding-left: 20px;
+  list-style-type: disc;
+  margin-bottom: 0;
+}
+
+/* ============ MCQ AREA ============ */
+.scroll-mcq-box {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.form-check {
+  margin-bottom: 10px;
+}
+
+.form-check-input:checked {
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+}
+
+/* ============ INPUT STYLES ============ */
+textarea,
+input[type="text"] {
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+}
+
+textarea:focus,
+input[type="text"]:focus {
+  border-color: #a970ff;
+  box-shadow: 0 0 0 0.15rem rgba(123, 47, 247, 0.25);
+  outline: none;
+}
+
+/* ============ BUTTONS ============ */
 .gradient-record-btn {
-  background:radial-gradient( circle farthest-corner at 10% 20%,  rgba(235,183,241,1) 17.3%, rgba(228,145,235,1) 90% );
+  background: linear-gradient(to right, #f66ec1, #f78baf);
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  transition: 0.3s;
+}
+
+.gradient-play-btn {
+  background: linear-gradient(to right, #7b2ff7, #c084fc);
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  transition: 0.3s;
+}
+
+.gradient-record-btn:hover,
+.gradient-play-btn:hover {
+  opacity: 0.9;
+}
+
+.gradient-prev-btn {
+  background: linear-gradient(to right, #b19cd9, #8e2de2);
   color: white;
   font-weight: 600;
   font-size: 15px;
@@ -9,8 +105,8 @@
   transition: background 0.3s ease;
 }
 
-.gradient-record-btn:hover {
-  background:radial-gradient( circle farthest-corner at 10% 20%,  rgba(236,158,248,1) 0%,  rgba(228,145,235,1) 92.1% );
+.gradient-prev-btn:hover {
+  background: linear-gradient(to right, #a78dd6, #702ccf);
 }
 
 .gradient-next-btn {
@@ -38,43 +134,13 @@
   border-radius: 8px;
   transition: background 0.3s ease;
 }
-
 .gradient-submit-btn:hover {
   background: linear-gradient(to right, #30d95d, #27e0c6);
 }
 
-.gradient-prev-btn {
-  background: linear-gradient(to right, #b19cd9, #8e2de2);
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-}
-
-.gradient-prev-btn:hover {
-  background: linear-gradient(to right, #a78dd6, #702ccf);
-}
-
-.gradient-play-btn {
-  background:linear-gradient( 109.6deg,  rgba(75,228,255,1) 11.2%, rgba(188,204,251,1) 100.6% );
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-}
-
-.gradient-play-btn:hover {
-  background:linear-gradient( 109.6deg,  rgba(75,228,255,1) 11.2%, rgba(188,204,251,1) 98.6% );
-}
-/* Align instruction list */
-.instruction-box ul {
-  text-align: left;
-  padding-left: 20px;
-  list-style-position: inside;
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+  .d-flex.flex-wrap.gap-4 {
+    flex-direction: column;
+  }
 }

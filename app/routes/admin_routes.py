@@ -3,10 +3,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import pandas as pd
 import secrets
-
+from pytz import timezone, utc
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app import db
-from app.models import User, Test, Section, StudentTestMap
+from app.models import User, Test, Section, StudentTestMap , StudentSectionProgress
 from app.utils.email_sender import send_credentials
 
 bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
@@ -46,8 +46,12 @@ def logout():
 @bp.route('/dashboard')
 @jwt_required(role='admin')
 def dashboard():
+    admin_id = request.user_id
+    admin = User.query.get(admin_id)
+    
     tests = Test.query.order_by(Test.id.desc()).all()
-    return render_template('admin_dashboard.html', tests=tests)
+    return render_template('admin_dashboard.html', tests=tests, admin=admin)
+
 
 
 @bp.route('/create_test', methods=['GET', 'POST'])
@@ -58,8 +62,10 @@ def create_test():
     if request.method == 'POST':
         test_name = request.form['test_name']
         test_duration = int(request.form['test_duration'])
-        start_date = datetime.strptime(request.form['start_date'], "%Y-%m-%dT%H:%M")
-        end_date = datetime.strptime(request.form['end_date'], "%Y-%m-%dT%H:%M")
+        ist = timezone('Asia/Kolkata')
+        start_date = ist.localize(datetime.strptime(request.form['start_date'], "%Y-%m-%dT%H:%M")).astimezone(utc)
+        end_date = ist.localize(datetime.strptime(request.form['end_date'], "%Y-%m-%dT%H:%M")).astimezone(utc)
+
 
         selected_sections = request.form.getlist('sections')
         if not selected_sections:
@@ -76,8 +82,9 @@ def create_test():
                 return redirect(request.url)
 
             section_ids.append(sid)
-            num_questions.append(nq)
-            section_durations.append(dur)
+            num_questions.append(str(int(nq)))  # store as stringified int
+            section_durations.append(str(int(dur)))  # force valid integer in minutes
+
 
         test = Test(
             test_name=test_name,
@@ -94,7 +101,9 @@ def create_test():
         flash("Test created successfully!", "success")
         return redirect(url_for('admin_routes.dashboard'))
 
-    return render_template('create_test.html', sections=sections)
+    admin = User.query.get(request.user_id)
+    return render_template('create_test.html', sections=sections, admin=admin)
+
 
 
 @bp.route('/assign_test/<int:test_id>', methods=['GET', 'POST'])
@@ -167,16 +176,23 @@ def assign_test(test_id):
             df.to_csv("temp_upload.csv", index=False)
             flash("Preview the test and students below. Click 'Confirm & Assign Test' to continue.", "info")
 
-    return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data)
+    admin = User.query.get(request.user_id)
+    return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
+
 
 
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
 @jwt_required(role='admin')
 def delete_test(test_id):
+    # Clean up dependent records
+    StudentSectionProgress.query.filter_by(test_id=test_id).delete()
     StudentTestMap.query.filter_by(test_id=test_id).delete()
+
+    # Now delete the test
     Test.query.filter_by(id=test_id).delete()
     db.session.commit()
+
     flash("Test deleted successfully.", "success")
     return redirect(url_for('admin_routes.dashboard'))
 

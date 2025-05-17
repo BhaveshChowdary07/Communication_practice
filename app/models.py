@@ -54,5 +54,10 @@ class SectionQuestion(db.Model):
     correct_option = db.Column(db.String(1))  # if MCQ
     is_text_input = db.Column(db.Boolean, default=True)
     is_audio_input = db.Column(db.Boolean, default=False)
-
-
+class StudentSectionProgress(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'))
+    section_id = db.Column(db.Integer, db.ForeignKey('section.id'))
+    start_time = db.Column(db.DateTime)
+    submitted = db.Column(db.Boolean, default=False)

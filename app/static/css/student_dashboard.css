@@ -86,3 +86,9 @@ body, html {
         font-size: 0.9rem;
     }
 }
+.navbar {
+  border-bottom: 1px solid #eee;
+}
+.navbar-brand {
+  font-size: 1.5rem;
+}

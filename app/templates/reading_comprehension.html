@@ -1,29 +1,61 @@
 {% if section.type == 'reading_comprehension' %}
-<div class="story-section">
-  <h6 class="story-label">Read the comprehension carefully:</h6>
-  <div class="story-box mb-4">
-    {{ q.question_text }}
-  </div>
+<div class="container px-3 pb-2">
 
-  {% if q.subquestions %}
-    {% for subq in q.subquestions %}
-      <div class="mb-4">
-        <p class="fw-semibold mb-2">Q{{ loop.index }}. {{ subq['question'] }}</p>
-        {% for opt in ['a', 'b', 'c', 'd'] %}
-          <div class="form-check">
-            <input class="form-check-input" type="radio"
-                   name="q{{ q.id }}_{{ loop.index0 }}"
-                   id="q{{ q.id }}_{{ loop.index0 }}_{{ opt }}"
-                   value="{{ opt|upper }}">
-            <label class="form-check-label" for="q{{ q.id }}_{{ loop.index0 }}_{{ opt }}">
-              {{ subq['option_' + opt] }}
-            </label>
+  <form method="POST">
+    <!-- Hidden Inputs -->
+     <input type="hidden" name="submit" id="submit-hidden" value="1">
+    <input type="hidden" name="current_index" value="{{ current_index }}">
+    <input type="hidden" name="end_timestamp" value="{{ end_timestamp }}">
+
+    <!-- Passage Box -->
+    <div class="story-box mb-4">
+      <h5 class="fw-semibold mb-2">Passage</h5>
+      <div class="story-text">
+        {{ q.question_text }}
+      </div>
+    </div>
+
+    <!-- Scrollable Questions -->
+    <div class="scroll-mcq-box">
+      <h6 class="fw-semibold mb-3">Answer the questions:</h6>
+      {% if q.subquestions %}
+        {% for subq in q.subquestions %}
+          {% set idx = loop.index0 %}
+          <div class="mb-4">
+            <p class="fw-semibold mb-1">Q{{ loop.index }}. {{ subq['question'] }}</p>
+            {% for opt in ['a', 'b', 'c', 'd'] %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio"
+                       name="q{{ q.id }}_{{ idx }}"
+                       id="q{{ q.id }}_{{ idx }}_{{ opt }}"
+                       value="{{ opt|upper }}">
+                <label class="form-check-label" for="q{{ q.id }}_{{ idx }}_{{ opt }}">
+                  {{ subq['option_' + opt] }}
+                </label>
+              </div>
+            {% endfor %}
           </div>
         {% endfor %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <div class="alert alert-warning">⚠️ No subquestions found for this question.</div>
-  {% endif %}
+      {% else %}
+        <div class="alert alert-warning">⚠️ No subquestions found for this passage.</div>
+      {% endif %}
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="d-flex justify-content-between mt-4">
+      {% if current_index > 0 %}
+        <button type="submit" name="prev" value="1" class="btn gradient-prev-btn">← Previous</button>
+      {% else %}
+        <div></div>
+      {% endif %}
+
+      {% if current_index + 1 == total %}
+        <button type="submit" name="submit" value="1" class="btn gradient-submit-btn" id="submit-btn">Submit</button>
+      {% else %}
+        <button type="submit" name="next" value="1" class="btn gradient-next-btn">Next →</button>
+      {% endif %}
+    </div>
+  </form>
+
 </div>
 {% endif %}

@@ -69,7 +69,7 @@ body, html {
 }
 
 .btn {
-    padding: 8px 14px;
+    padding: 8px 14px ;
     border-radius: 8px;
     text-decoration: none;
     font-size: 0.9rem;
@@ -78,21 +78,46 @@ body, html {
 }
 
 .btn-assign {
-    background-color: #8a64ff;
-    color: white;
+  background-color: #8a64ff !important;
+  color: white !important;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none !important;
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.btn-assign:hover {
+  background-color: #6f3edb !important;
+  color: white !important;
 }
 
-.btn-assign:hover {
-    background-color: #6f3edb;
-}
 
 .btn-delete {
-    background-color: #ff4f70;
-    color: white;
-    border-color: #ff4f70;
+    background-color: #ff4f70 !important;
+    color: white !important;
+    border-color: #ff4f70 !important;
+     padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-delete:hover {
-    background-color: #e23c5c;
-    border-color: #e23c5c;
+    background-color: #e23c5c !important;
+    border-color: #e23c5c !important;
+}
+nav.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
 }

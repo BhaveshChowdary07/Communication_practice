@@ -1,14 +1,64 @@
 {% if section.type == 'story_retelling' %}
-<div class="story-retell-section">
-  <h6 class="audio-label">Listen to the story:</h6>
-  <button type="button" class="btn play-audio-btn mb-4" onclick="playAudio({{ q.id }})">
-    ▶️ Play Audio
-  </button>
+<div class="container py-4">
+  <h2 class="text-center fw-semibold mb-2 text-purple">Story Retelling</h2>
+  <p class="text-center text-muted mb-4">Listen to the story and retell it in your own words.</p>
 
-  <h6 class="audio-label">Retell the story in your own words:</h6>
-  <button type="button" class="btn record-btn" onclick="toggleRecording({{ q.id }}, this)">
-    🎙️ Start Recording
-  </button>
+  <form method="POST">
+    <input type="hidden" name="submit" id="submit-hidden" value="1">
+    <input type="hidden" name="end_timestamp" value="{{ end_timestamp }}">
+    <input type="hidden" name="end_timestamp" value="{{ end_timestamp }}">
+    <input type="hidden" name="current_index" value="{{ current_index }}">
+
+    <div class="d-flex flex-wrap gap-4">
+
+      <!-- Left: Instructions -->
+      <div class="flex-fill instruction-box" style="min-width: 280px;">
+        <h5 class="fw-semibold mb-3">Instructions</h5>
+        <ul class="ps-3">
+          <li>Click "Play Audio" to listen to the story.</li>
+          <li>Understand the main idea and flow of events.</li>
+          <li>Click "Start Recording" to retell the story.</li>
+          <li>Speak in your own words clearly.</li>
+          <li>You will get only one attempt.</li>
+        </ul>
+      </div>
+
+      <!-- Right: Audio & Record -->
+      <div class="flex-fill interaction-box" style="min-width: 280px;">
+        <h6 class="fw-semibold mb-2">Listen and Retell:</h6>
+
+        <div class="mb-3">
+          <button type="button"
+        class="btn w-100 text-white fw-semibold py-2 px-3 gradient-play-btn"
+        onclick="playAudio({{ q.id }})">
+  ▶ Play Audio
+</button>
+
+        </div>
+
+        <button type="button"
+        class="btn w-100 fw-semibold py-2 px-3 text-white gradient-record-btn"
+        onclick="toggleRecording({{ q.id }}, this)">
+  🎙️ Start Recording
+</button>
+
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="d-flex justify-content-between mt-4">
+      {% if current_index > 0 %}
+        <button type="submit" name="prev" value="1" class="btn gradient-prev-btn" onclick="stopActiveRecording()">← Previous</button>
+      {% else %}
+        <div></div>
+      {% endif %}
+
+      {% if current_index + 1 == questions|length %}
+        <button type="submit" name="submit" value="1" class="btn gradient-submit-btn" onclick="stopActiveRecording()">Submit</button>
+      {% else %}
+        <button type="submit" name="next" value="1" class="btn gradient-next-btn" onclick="stopActiveRecording()">Next →</button>
+      {% endif %}
+    </div>
+  </form>
 </div>
-
 {% endif %}

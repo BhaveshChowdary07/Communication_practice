@@ -1,10 +1,54 @@
 {% if section.type == 'grammar' %}
-<div class="grammar-container">
-  <h5 class="question-label">Fill in the blank:</h5>
-  <div class="question-row">
-    <span>I</span>
-    <input type="text" name="grammar_answer_{{ q.id }}" class="grammar-input" placeholder="Type here...">
-    <span>({{ q.question_text }}) at the hotel.</span>
-  </div>
+<div class="container py-4">
+  <h2 class="text-center fw-semibold mb-2 text-purple">Grammar</h2>
+  <p class="text-center text-muted mb-4">Fill in the blank with the correct word or phrase.</p>
+
+  <form method="POST">
+    <input type="hidden" name="submit" id="submit-hidden" value="1">
+    <input type="hidden" name="current_index" value="{{ current_index }}">
+
+    <div class="d-flex flex-wrap gap-4">
+
+      <!-- Left: Instructions -->
+      <div class="flex-fill instruction-box" style="min-width: 280px;">
+        <h5 class="fw-semibold mb-3">Instructions</h5>
+        <ul class="ps-3">
+          <li>Read the sentence carefully.</li>
+          <li>Understand the context and meaning.</li>
+          <li>Type your answer in the input box.</li>
+          <li>Use correct spelling and grammar.</li>
+          <li>Only one submission is allowed.</li>
+        </ul>
+      </div>
+
+      <!-- Right: Question + Answer Input -->
+      <div class="flex-fill interaction-box" style="min-width: 280px;">
+        <h6 class="fw-semibold mb-2">Question:</h6>
+        <div class="mb-3 border rounded p-3 bg-light fw-semibold text-dark">
+          {{ q.question_text | safe }}
+        </div>
+
+        <input type="text"
+               name="grammar_answer_{{ q.id }}"
+               class="form-control p-2 fw-semibold"
+               placeholder="Type your answer here..." required>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="d-flex justify-content-between mt-4">
+      {% if current_index > 0 %}
+        <button type="submit" name="prev" value="1" class="btn gradient-prev-btn">← Previous</button>
+      {% else %}
+        <div></div>
+      {% endif %}
+
+      {% if current_index + 1 == questions|length %}
+        <button type="submit" name="submit" value="1" class="btn gradient-submit-btn">Submit</button>
+      {% else %}
+        <button type="submit" name="next" value="1" class="btn gradient-next-btn">Next →</button>
+      {% endif %}
+    </div>
+  </form>
 </div>
 {% endif %}

@@ -1,18 +1,41 @@
-
 {% if section.type == 'essay_writing' %}
-<div class="essay-section">
-  <h6 class="essay-label">Write your response to the following prompt:</h6>
-  <div class="essay-prompt mb-3">
-    {{ q.question_text }}
-  </div>
+<div class="container px-3 pb-2">
 
-  <textarea class="form-control essay-textarea" name="essay_answer_{{ q.id }}"
-            rows="10" maxlength="1000" placeholder="Start typing here..."
-            oninput="updateCharCount(this)"></textarea>
+  <form method="POST">
+    <!-- Hidden Inputs -->
+     <input type="hidden" name="submit" id="submit-hidden" value="1">
+    <input type="hidden" name="current_index" value="{{ current_index }}">
+    <input type="hidden" name="end_timestamp" value="{{ end_timestamp }}">
 
-  <div class="text-end mt-2 text-muted">
-    <span id="char-count">Characters: 0 / 1000</span>
-  </div>
+    <!-- Essay Prompt Box -->
+    <div class="story-box mb-4">
+      <h5 class="fw-semibold mb-2">Topic</h5>
+      <div class="story-text">
+        {{ q.question_text }}
+      </div>
+    </div>
+
+    <!-- Essay Answer Box -->
+    <div class="essay-answer-box">
+      <h6 class="fw-semibold mb-2">Write your response below</h6>
+      <textarea name="essay_answer_{{ q.id }}" class="form-control" rows="8" placeholder="Write your essay here..." style="resize: vertical;"></textarea>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="d-flex justify-content-between mt-4">
+      {% if current_index > 0 %}
+        <button type="submit" name="prev" value="1" class="btn gradient-prev-btn">← Previous</button>
+      {% else %}
+        <div></div>
+      {% endif %}
+
+      {% if current_index + 1 == total %}
+        <button type="submit" name="submit" value="1" class="btn gradient-submit-btn" id="submit-btn">Submit</button>
+      {% else %}
+        <button type="submit" name="next" value="1" class="btn gradient-next-btn">Next →</button>
+      {% endif %}
+    </div>
+  </form>
+
 </div>
-
 {% endif %}

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -5,114 +6,113 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/take_section.css') }}" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .layout-box {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .instruction-box, .question-box {
-      flex: 1 1 48%;
-      background: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 300px;
-    }
-    @media (max-width: 768px) {
-      .layout-box {
-        flex-direction: column;
-      }
-    }
-    .gradient-bg {
-      background: linear-gradient(to bottom right, #e4edff, #f5dfff);
-      min-height: 100vh;
-    }
-  </style>
 </head>
+
 <body class="bg-light">
-<div class="gradient-bg">
-  <div class="container py-4">
-    <h1 class="text-center mb-1">{{ section.name }}</h1>
-    <p class="text-center text-muted mb-4">{{ section.description }}</p>
+  {% include 'partials/student_header.html' with context %}
+  <div class="container px-3 pb-2 mt-4">
 
-    <form method="POST">
-      <input type="hidden" name="current_index" value="{{ current_index }}">
-      {% set total = questions | length %}
-      {% set q = questions[current_index] %}
-
-      <div class="layout-box mb-4">
-        <!-- Instruction Box -->
-        <div class="instruction-box">
-          <h5 class="fw-semibold">Instructions</h5>
-          <ul>
-  {% if section.type == 'grammar' %}
-    <li>Fill in the blank appropriately.</li>
-  {% elif section.type == 'sentence_repeating' %}
-    <li>Click 'Play Audio' to listen.</li>
-    <li>Repeat the sentence aloud and record it.</li>
-  {% elif section.type == 'sentence_reading' %}
-    <li>Read the sentence aloud and record it.</li>
-  {% elif section.type == 'just_a_minute' %}
-    <li>Listen to the topic and speak for 30–45 seconds.</li>
-  {% elif section.type == 'essay_writing' %}
-    <li>Write a thoughtful essay based on the prompt.</li>
-  {% elif section.type == 'jumbled_sentences' %}
-    <li>Listen to the jumbled sentence and say the correct version aloud.</li>
-  {% elif section.type == 'story_retelling' %}
-    <li>Listen to the story and retell it in your own words via audio.</li>
-  {% elif section.type == 'short_stories' %}
-    <li>Read the story and answer the MCQs below.</li>
-  {% elif section.type == 'reading_comprehension' %}
-    <li>Read the passage carefully and choose the correct answers.</li>
-  {% endif %}
-</ul>
-
-        </div>
-
-        <!-- Question Box -->
-        <div class="question-box">
-          <h6 class="text-secondary mb-3">Question {{ current_index + 1 }} of {{ total }}</h6>
-          {% if section.type == 'grammar' %}
-            {% include 'grammar.html' %}
-          {% elif section.type == 'sentence_reading' %}
-            {% include 'sentence_reading.html' %}
-          {% elif section.type == 'sentence_repeating' %}
-            {% include 'sentence_repeating.html' %}
-          {% elif section.type == 'just_a_minute' %}
-            {% include 'just_a_minute.html' %}
-          {% elif section.type == 'essay_writing' %}
-            {% include 'essay.html' %}
-          {% elif section.type == 'short_stories' %}
-            {% include 'short_stories.html' %}
-          {% elif section.type == 'reading_comprehension' %}
-            {% include 'reading_comprehension.html' %}
-          {% elif section.type == 'jumbled_sentences' %}
-            {% include 'jumbled_sentences.html' %}
-          {% elif section.type == 'story_retelling' %}
-            {% include 'story_retelling.html' %}
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Navigation Buttons -->
-      <div class="d-flex justify-content-between mt-4">
-        {% if current_index > 0 %}
-          <button type="submit" name="prev" value="1" class="btn gradient-prev-btn" onclick="stopActiveRecording()">← Previous</button>
-        {% else %}
-          <div></div>
-        {% endif %}
-        {% if current_index + 1 == total %}
-          <button type="submit" name="submit" value="1" class="btn gradient-submit-btn" id="submit-btn" onclick="stopActiveRecording()">Submit</button>
-        {% else %}
-          <button type="submit" name="next" value="1" class="btn gradient-next-btn" onclick="stopActiveRecording()">Next →</button>
-        {% endif %}
-      </div>
-    </form>
-  </div>
 </div>
+  <div class="gradient-bg">
+    {% set total = questions | length %}
+    {% set q = questions[current_index] %}
+
+    <!-- SECTION HANDLER -->
+    {% if section.type == 'essay_writing' %}
+      {% include 'essay.html' %}
+    {% elif section.type == 'short_stories' %}
+      {% include 'short_stories.html' %}
+    {% elif section.type == 'reading_comprehension' %}
+      {% include 'reading_comprehension.html' %}
+    {% elif section.type == 'grammar' %}
+      {% include 'grammar.html' %}
+    {% elif section.type == 'sentence_repeating' %}
+      {% include 'sentence_repeating.html' %}
+    {% elif section.type == 'sentence_reading' %}
+      {% include 'sentence_reading.html' %}
+    {% elif section.type == 'just_a_minute' %}
+      {% include 'just_a_minute.html' %}
+    {% elif section.type == 'jumbled_sentences' %}
+      {% include 'jumbled_sentences.html' %}
+    {% elif section.type == 'story_retelling' %}
+      {% include 'story_retelling.html' %}
+    {% endif %}
+  </div>
 </body>
+<script>
+let mediaRecorder = null;
+let audioChunks = [];
+let activeBtn = null;
+
+function toggleRecording(questionId, btn) {
+  if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        btn.innerText = "🎙️ Record Audio";
+        btn.classList.remove("btn-secondary");
+        btn.classList.add("btn-outline-danger");
+        stream.getTracks().forEach(track => track.stop());
+        activeBtn = null;
+      };
+
+      mediaRecorder.start();
+      btn.innerText = "⏹ Stop Recording";
+      btn.classList.remove("btn-outline-danger");
+      btn.classList.add("btn-secondary");
+      activeBtn = btn;
+    }).catch(error => {
+      console.error("Microphone access denied:", error);
+      alert("Please allow microphone access to record audio.");
+    });
+  } else if (mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+  }
+}
+
+function stopActiveRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+  }
+}
+
+function playAudio(questionId) {
+  const audio = new Audio(`/student/audio/${questionId}`);
+  audio.play().catch(error => {
+    console.error("Audio play failed:", error);
+    alert("Could not play audio. Please check your device settings.");
+  });
+}
+
+function startTimer(endTime) {
+  const countdown = document.getElementById("timer");
+  countdown.style.opacity = 1;
+  const interval = setInterval(() => {
+    const now = new Date().getTime();
+    const distance = endTime - now;
+
+    if (distance <= 0) {
+      clearInterval(interval);
+      countdown.innerHTML = "Time's up!";
+      document.getElementById("submit-hidden").value = "1";
+      document.querySelector("form").submit();
+    } else {
+      const minutes = Math.floor(distance / 60000);
+      const seconds = Math.floor((distance % 60000) / 1000);
+      countdown.innerHTML = `${minutes}m ${seconds}s`;
+    }
+  }, 1000);
+}
+
+const endTimestamp = {{ end_timestamp | tojson }};
+console.log("Client-side endTimestamp:", endTimestamp);
+console.log("Current time:", new Date().getTime());
+startTimer(endTimestamp);
+</script>
 </html>
