@@ -1,1 +1,54 @@
-/__pycache__
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# VSCode / PyCharm / IDE settings
+.vscode/
+.idea/
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Flask cache / instance folder / local files
+*.log
+*.pot
+*.pyc
+instance/
+*.sqlite3
+*.db
+
+# Python environment files
+*.env
+.env
+.env.*
+
+# Flask-specific
+*.pyo
+*.pyd
+*.pid
+
+# Gunicorn log (if you write to file)
+gunicorn.log
+
+# Pytest / Coverage
+.coverage
+.tox/
+.cache/
+.pytest_cache/
+
+# Uploads or compiled assets
+uploads/
+__cache__/
+
+# Render-specific (don't ignore these)
+!requirements.txt
+!start.sh
+!run.py
