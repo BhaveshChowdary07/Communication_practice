@@ -6,7 +6,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev_secret_key'
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://admin:admin123@localhost/comm_test_db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Email settings for Flask-Mail (example for Gmail SMTP)

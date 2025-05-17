@@ -179,8 +179,23 @@ def assign_test(test_id):
     admin = User.query.get(request.user_id)
     return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
 
+@bp.route('/admin/add-shell-admin')
+def add_shell_admin():
+    from app.models import User
+    from werkzeug.security import generate_password_hash
+    existing = User.query.filter_by(email="admin@example.com").first()
+    if existing:
+        return "Admin already exists."
 
-
+    admin = User(
+        name="Admin",
+        email="admin@example.com",
+        role="admin",
+        password=generate_password_hash("admin123")
+    )
+    db.session.add(admin)
+    db.session.commit()
+    return "✅ Admin created successfully!"
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
 @jwt_required(role='admin')

@@ -16,6 +16,9 @@ app.register_blueprint(student_routes.bp)
 import base64
 app.jinja_env.filters['b64encode'] = lambda data: base64.b64encode(data).decode('utf-8') if data else ''
 
+with app.app_context():
+    db.create_all()
+
 @app.route('/')
 def home():
     return render_template('home.html')
