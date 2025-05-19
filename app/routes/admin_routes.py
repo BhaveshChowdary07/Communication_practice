@@ -1,12 +1,15 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from pytz import timezone, utc
+from sqlalchemy.exc import OperationalError
 import pandas as pd
 import secrets
-from pytz import timezone, utc
-from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
+import threading
+
 from app import db
-from app.models import User, Test, Section, StudentTestMap , StudentSectionProgress
+from app.models import User, Test, Section, StudentTestMap, StudentSectionProgress
+from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app.utils.email_sender import send_credentials
 
 bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
@@ -122,18 +125,23 @@ def create_test():
     return render_template('create_test.html', sections=sections, admin=admin)
 
 
-
 @bp.route('/assign_test/<int:test_id>', methods=['GET', 'POST'])
 @jwt_required(role='admin')
 def assign_test(test_id):
-    from flask import session
     csv_data = None
-    test = Test.query.get(test_id)
+
+    # ✅ Defensive test fetch
+    try:
+        test = db.session.get(Test, test_id)
+    except OperationalError:
+        flash("Could not load test from database. Please try again later.", "danger")
+        return redirect(url_for('admin_routes.dashboard'))
 
     if request.method == 'GET':
         session.pop('_flashes', None)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
+        # ✅ CONFIRM block
         if 'confirm' in request.form:
             try:
                 df = pd.read_csv("temp_upload.csv")
@@ -142,6 +150,7 @@ def assign_test(test_id):
                 return redirect(request.url)
 
             csv_data = df.to_dict(orient='records')
+            student_creds = []
 
             for _, row in df.iterrows():
                 name = row['name']
@@ -150,14 +159,12 @@ def assign_test(test_id):
                 student = User.query.filter_by(email=email, role='student').first()
 
                 if not student:
-                    # Generate new password
                     password_plain = secrets.token_urlsafe(6)
                     hashed_pw = generate_password_hash(password_plain)
                     student = User(name=name, email=email, password=hashed_pw, role='student')
                     db.session.add(student)
                     db.session.flush()
                 else:
-                    # Reuse old password if available from any previous assignment
                     existing_map_any = StudentTestMap.query.filter_by(student_id=student.id).first()
                     if existing_map_any and existing_map_any.password:
                         password_plain = existing_map_any.password
@@ -165,7 +172,6 @@ def assign_test(test_id):
                         password_plain = secrets.token_urlsafe(6)
                         student.password = generate_password_hash(password_plain)
 
-                # Assign test if not already done
                 existing_map = StudentTestMap.query.filter_by(student_id=student.id, test_id=test_id).first()
                 if not existing_map:
                     map_entry = StudentTestMap(
@@ -175,13 +181,24 @@ def assign_test(test_id):
                     )
                     db.session.add(map_entry)
 
-                # ✅ Send email with reused/generated password
-                send_credentials(email=email, password=password_plain, test_id=test_id)
+                student_creds.append((email, password_plain))
 
             db.session.commit()
-            flash("Students assigned and credentials sent!", "success")
+
+            # ✅ Background thread to send emails
+            def send_bulk_emails(student_data, test_id):
+                for email, password in student_data:
+                    try:
+                        send_credentials(email=email, password=password, test_id=test_id)
+                    except Exception as e:
+                        print(f"[EMAIL ERROR] Failed to send to {email}: {e}")
+
+            threading.Thread(target=send_bulk_emails, args=(student_creds, test_id)).start()
+
+            flash("Students assigned! Emails are being sent in the background.", "success")
             return redirect(url_for('admin_routes.dashboard'))
 
+        # ✅ CSV upload preview
         else:
             file = request.files.get('csv_file')
             if not file:
