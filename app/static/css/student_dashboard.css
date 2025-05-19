@@ -73,6 +73,13 @@ body, html {
   font-weight: 600 !important;
   margin-top: 10px !important;
 }
+.text-muted {
+  color: #6b7280 !important;
+}
+
+.text-success {
+  color: #10b981 !important;
+}
 
 .navbar {
   border-bottom: 1px solid #e5e7eb !important;

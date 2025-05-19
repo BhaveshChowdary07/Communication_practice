@@ -97,3 +97,23 @@ input[type="text"]:focus {
     flex-direction: column !important;
   }
 }
+button.gradient-play-btn,
+button.gradient-record-btn,
+button.btn-view-sections {
+  all: unset;
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #111111 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  text-align: center !important;
+}
+
+button.gradient-play-btn:hover,
+button.gradient-record-btn:hover,
+button.btn-view-sections:hover {
+  background-color: #000000 !important;
+}

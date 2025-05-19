@@ -66,9 +66,16 @@
                   <p><strong>End:</strong> {{ test.test.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
                 </div>
                 <div>
-                  <button class="btn btn-gradient" type="button" data-bs-toggle="collapse" data-bs-target="#testSections{{ loop.index }}">
-                    View Sections
-                  </button>
+                  {% if test.availability == 'not_started' %}
+  <span class="text-muted fw-semibold">🕒 Test Not Started</span>
+{% elif test.availability == 'completed' %}
+  <span class="text-success fw-semibold">✅ Test Completed</span>
+{% else %}
+  <button class="btn btn-start" type="button" data-bs-toggle="collapse" data-bs-target="#testSections{{ loop.index }}">
+    View Sections
+  </button>
+{% endif %}
+
                 </div>
               </div>
 

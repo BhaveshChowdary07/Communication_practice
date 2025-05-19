@@ -7,6 +7,7 @@ from sqlalchemy import text
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app import db
 from app.models import User, StudentTestMap, Test, Section, SectionQuestion
+from datetime import datetime
 
 bp = Blueprint('student_routes', __name__, url_prefix='/student')
 
@@ -46,6 +47,9 @@ def logout():
 
 @bp.route('/dashboard')
 @jwt_required(role='student')
+
+@bp.route('/dashboard')
+@jwt_required(role='student')
 def dashboard():
     student_id = request.user_id
     student = User.query.get(student_id)
@@ -56,10 +60,18 @@ def dashboard():
     for tm in test_maps:
         test = Test.query.get(tm.test_id)
         if test:
+            now = datetime.utcnow()
+
+            if now < test.start_date:
+                test_status = "not_started"
+            elif now > test.end_date:
+                test_status = "completed"
+            else:
+                test_status = "active"
+
             section_ids = [int(sid) for sid in test.sections.split(',') if sid.strip()]
             sections = Section.query.filter(Section.id.in_(section_ids)).all()
 
-            # ✅ Track completion status per section
             section_status = {}
             for section in sections:
                 progress = StudentSectionProgress.query.filter_by(
@@ -72,10 +84,12 @@ def dashboard():
             enriched_tests.append({
                 'test': test,
                 'sections': sections,
-                'status': section_status
+                'status': section_status,
+                'availability': test_status  # 👈 add availability status
             })
 
     return render_template("student_dashboard.html", tests=enriched_tests, student=student)
+
 
 @bp.route('/test/<int:test_id>')
 @jwt_required(role='student')
@@ -137,27 +151,33 @@ def take_section(section_id):
     except ValueError:
         flash("Section not configured correctly in test.", "danger")
         return redirect(url_for('student_routes.dashboard'))
-
-    # Handle progress record and timer
-    progress = StudentSectionProgress.query.filter_by(
+    
+    # Check if already submitted
+    existing_progress = StudentSectionProgress.query.filter_by(
         student_id=student_id,
         test_id=matched_test.id,
         section_id=section_id
     ).first()
 
-    if not progress:
-        progress = StudentSectionProgress(
+    if existing_progress and existing_progress.submitted:
+        flash("This section has already been submitted. You cannot retake it.", "warning")
+        return redirect(url_for('student_routes.dashboard'))
+
+    # Create progress if it doesn't exist
+    if not existing_progress:
+        existing_progress = StudentSectionProgress(
             student_id=student_id,
             test_id=matched_test.id,
             section_id=section_id,
             start_time=datetime.utcnow()
         )
-        db.session.add(progress)
+        db.session.add(existing_progress)
         db.session.commit()
+
 
     from pytz import utc
 
-    end_time = progress.start_time.replace(tzinfo=utc) + timedelta(minutes=section_duration)
+    end_time = existing_progress.start_time.replace(tzinfo=utc) + timedelta(minutes=section_duration)
     end_timestamp = int(end_time.timestamp() * 1000)
 
 
@@ -206,7 +226,7 @@ def take_section(section_id):
         elif 'prev' in request.form:
             current_index = max(current_index - 1, 0)
         elif 'submit' in request.form:
-            progress.submitted = True
+            existing_progress.submitted = True
             db.session.commit()
             flash("Section submitted!", "success")
             return redirect(url_for('student_routes.dashboard'))
@@ -217,7 +237,7 @@ def take_section(section_id):
         current_index=current_index,
         student=User.query.get(student_id),
         end_timestamp=end_timestamp,
-        submitted=progress.submitted
+        submitted=existing_progress.submitted
     )
 
 @bp.route('/audio/<int:question_id>')

@@ -4,13 +4,14 @@ EMAIL_API_URL = "https://submissions.azurewebsites.net/api/sendEmail"
 
 def send_credentials(email, password, test_id):
     subject = "Your Communication Test Login"
+    render_base_url = "https://communication-practice.onrender.com/"
     body = f"""
 Hello,<br><br>
 You have been assigned a communication test.<br><br>
 <b>Login Email:</b> {email}<br>
 <b>Password:</b> {password}<br>
 <b>Test ID:</b> {test_id}<br><br>
-You can log in to take the test at: <a href="http://127.0.0.1:5000/student/login">Click here to login</a><br><br>
+You can log in to take the test at: <a href="{render_base_url}/student/login">Click here to login</a><br><br>
 Thanks,<br>
 <b>Test Platform Team</b>
 """

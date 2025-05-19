@@ -63,8 +63,25 @@ def create_test():
         test_name = request.form['test_name']
         test_duration = int(request.form['test_duration'])
         ist = timezone('Asia/Kolkata')
-        start_date = ist.localize(datetime.strptime(request.form['start_date'], "%Y-%m-%dT%H:%M")).astimezone(utc)
-        end_date = ist.localize(datetime.strptime(request.form['end_date'], "%Y-%m-%dT%H:%M")).astimezone(utc)
+        try:
+            start_date_input = request.form['start_date']
+            end_date_input = request.form['end_date']
+    
+            start_date = ist.localize(datetime.strptime(start_date_input, "%Y-%m-%dT%H:%M")).astimezone(utc)
+            end_date = ist.localize(datetime.strptime(end_date_input, "%Y-%m-%dT%H:%M")).astimezone(utc)
+
+            if start_date >= end_date:
+                flash("⚠️ Start date must be before end date.", "danger")
+                return redirect(request.url)
+
+            if end_date <= datetime.utcnow().astimezone(utc):
+                flash("⚠️ End date must be in the future.", "danger")
+                return redirect(request.url)
+
+        except (ValueError, KeyError):
+            flash("⚠️ Invalid date or time format.", "danger")
+            return redirect(request.url)
+
 
 
         selected_sections = request.form.getlist('sections')
