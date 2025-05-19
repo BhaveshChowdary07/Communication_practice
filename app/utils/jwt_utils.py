@@ -12,7 +12,7 @@ with open("keys/public.pem", "r") as f:
 
 ALGORITHM = 'RS256'
 ACCESS_EXPIRY_MINUTES = 60
-REFRESH_EXPIRY_HOURS = 24
+REFRESH_EXPIRY_HOURS = 12
 
 
 def generate_access_token(user_id, role):
