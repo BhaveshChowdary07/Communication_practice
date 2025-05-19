@@ -47,9 +47,6 @@ def logout():
 
 @bp.route('/dashboard')
 @jwt_required(role='student')
-
-@bp.route('/dashboard')
-@jwt_required(role='student')
 def dashboard():
     student_id = request.user_id
     student = User.query.get(student_id)
