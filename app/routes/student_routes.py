@@ -8,7 +8,7 @@ from app.utils.jwt_utils import generate_access_token, generate_refresh_token, d
 from app import db
 from app.models import User, StudentTestMap, Test, Section, SectionQuestion
 from datetime import datetime
-
+from sqlalchemy.sql.expression import func
 bp = Blueprint('student_routes', __name__, url_prefix='/student')
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -191,23 +191,29 @@ def take_section(section_id):
         shuffle(questions)
 
     elif section.type in ['short_stories', 'reading_comprehension']:
-        questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
+        # ✅ RANDOMIZED main questions
+        questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(func.random()).limit(question_limit).all()
+
         for q in questions:
+            # ✅ RANDOMIZED subquestions
             subquestions = db.session.execute(
-                text("SELECT * FROM mcq_subquestions WHERE section_question_id = :id LIMIT 3"),
+                text("SELECT * FROM mcq_subquestions WHERE section_question_id = :id ORDER BY RANDOM() LIMIT 3"),
                 {"id": q.id}
             ).mappings().all()
-            q.subquestions = [{
+
+            q.subquestions = [
+                {
                 'question': sq['question_text'],
                 'option_a': sq['option_a'],
                 'option_b': sq['option_b'],
                 'option_c': sq['option_c'],
                 'option_d': sq['option_d']
-            } for sq in subquestions]
+                } for sq in subquestions
+            ]
 
     else:
-        questions = SectionQuestion.query.filter_by(section_id=section_id).limit(question_limit).all()
-
+        # ✅ RANDOMIZED for all other sections
+        questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(func.random()).limit(question_limit).all()
     # Navigation and submission logic
     current_index = 0
     if request.method == 'POST':
