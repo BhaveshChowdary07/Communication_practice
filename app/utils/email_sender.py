@@ -11,7 +11,8 @@ You have been assigned a communication test.<br><br>
 <b>Login Email:</b> {email}<br>
 <b>Password:</b> {password}<br>
 <b>Test ID:</b> {test_id}<br><br>
-You can log in to take the test at: <a href="{render_base_url}/student/login">Click here to login</a><br><br>
+You can log in to take the test at: <a href="https://www.practicetests.in/student/login">
+Click here to login</a><br><br>
 Thanks,<br>
 <b>Test Platform Team</b>
 """
