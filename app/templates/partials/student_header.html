@@ -7,7 +7,7 @@
 
     <!-- Logo -->
     <a class="navbar-brand fw-bold text-black" href="{{ url_for('student_routes.dashboard') }}">
-      <img src="logo.png">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height: 40px;">
     </a>
 
     <!-- Timer (only when applicable) -->

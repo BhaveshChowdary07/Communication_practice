@@ -11,7 +11,7 @@
 
 <div class="login-wrapper">
   <div class="login-card">
-    <img src="logo.png">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height: 40px;">
     <p class="subtext">Enter your test credentials</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
