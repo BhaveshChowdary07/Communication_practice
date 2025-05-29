@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from pytz import timezone, utc
@@ -42,7 +42,6 @@ def login():
 
 @bp.route('/logout')
 def logout():
-    # Redirect handled in frontend by clearing localStorage
     return redirect(url_for('admin_routes.login'))
 
 
@@ -54,7 +53,6 @@ def dashboard():
     
     tests = Test.query.order_by(Test.id.desc()).all()
     return render_template('admin_dashboard.html', tests=tests, admin=admin)
-
 
 
 @bp.route('/create_test', methods=['GET', 'POST'])
@@ -85,8 +83,6 @@ def create_test():
             flash("⚠️ Invalid date or time format.", "danger")
             return redirect(request.url)
 
-
-
         selected_sections = request.form.getlist('sections')
         if not selected_sections:
             flash("You must select at least one section to create a test.", "danger")
@@ -102,9 +98,8 @@ def create_test():
                 return redirect(request.url)
 
             section_ids.append(sid)
-            num_questions.append(str(int(nq)))  # store as stringified int
-            section_durations.append(str(int(dur)))  # force valid integer in minutes
-
+            num_questions.append(str(int(nq)))
+            section_durations.append(str(int(dur)))
 
         test = Test(
             test_name=test_name,
@@ -129,8 +124,6 @@ def create_test():
 @jwt_required(role='admin')
 def assign_test(test_id):
     csv_data = None
-
-    # ✅ Defensive test fetch
     try:
         test = db.session.get(Test, test_id)
     except OperationalError:
@@ -141,7 +134,6 @@ def assign_test(test_id):
         session.pop('_flashes', None)
 
     elif request.method == 'POST':
-        # ✅ CONFIRM block
         if 'confirm' in request.form:
             try:
                 df = pd.read_csv("temp_upload.csv")
@@ -185,20 +177,23 @@ def assign_test(test_id):
 
             db.session.commit()
 
-            # ✅ Background thread to send emails
-            def send_bulk_emails(student_data, test_id):
-                for email, password in student_data:
-                    try:
-                        send_credentials(email=email, password=password, test_id=test_id)
-                    except Exception as e:
-                        print(f"[EMAIL ERROR] Failed to send to {email}: {e}")
+            # ✅ Generate credentials CSV
+            credentials_records = []
+            for idx, (email, password) in enumerate(student_creds, start=1):
+                name_row = next((r['name'] for r in csv_data if r['email'] == email), '')
+                credentials_records.append({
+                    'sno': idx,
+                    'name': name_row,
+                    'email': email,
+                    'test_password': password,
+                    'test_login_link': "http://practicetests.in/student/login"
+                })
 
-            threading.Thread(target=send_bulk_emails, args=(student_creds, test_id)).start()
+            pd.DataFrame(credentials_records).to_csv("credentials_download.csv", index=False)
 
-            flash("Students assigned! Emails are being sent in the background.", "success")
+            flash("Students assigned! You can now download the credentials.", "success")
             return redirect(url_for('admin_routes.dashboard'))
 
-        # ✅ CSV upload preview
         else:
             file = request.files.get('csv_file')
             if not file:
@@ -206,39 +201,55 @@ def assign_test(test_id):
                 return redirect(request.url)
 
             df = pd.read_csv(file)
-            csv_data = df.to_dict(orient='records')
+            rows = []
+
+            for index, row in df.iterrows():
+                email = row.get('email') or row.get('Email') or row.get('EMAIL')
+                if not email:
+                    flash(f"Row {index + 2} is missing an email. Skipping.", "danger")
+                    continue
+
+                name = row.get('name') or row.get('Name')
+                if not name:
+                    name = row.get('roll_number') or row.get('Roll Number') or row.get('Roll_Number') or row.get('roll')
+
+                if not name:
+                    flash(f"Row {index + 2} has no name or roll number. Skipping.", "danger")
+                    continue
+
+                rows.append({
+                    'name': str(name).strip(),
+                    'email': str(email).strip()
+                })
+
+            if not rows:
+                flash("No valid rows found in the uploaded CSV. Please check formatting.", "danger")
+                return redirect(request.url)
+
+            df = pd.DataFrame(rows)
             df.to_csv("temp_upload.csv", index=False)
+            csv_data = df.to_dict(orient='records')
             flash("Preview the test and students below. Click 'Confirm & Assign Test' to continue.", "info")
 
     admin = User.query.get(request.user_id)
     return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
 
-@bp.route('/admin/add-shell-admin')
-def add_shell_admin():
-    from app.models import User
-    from werkzeug.security import generate_password_hash
-    existing = User.query.filter_by(email="bhavesh.chowdary@redsage.global").first()
-    if existing:
-        return "Admin already exists."
 
-    admin = User(
-        name="Admin",
-        email="bhavesh.chowdary@redsage.global",
-        role="admin",
-        password=generate_password_hash("admin123")
-    )
-    db.session.add(admin)
-    db.session.commit()
-    return "✅ Admin created successfully!"
+@bp.route('/download_credentials/<int:test_id>')
+@jwt_required(role='admin')
+def download_credentials(test_id):
+    try:
+        return send_file("credentials_download.csv", as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
+    except FileNotFoundError:
+        flash("Credential file not found. Please assign the test first.", "danger")
+        return redirect(url_for('admin_routes.assign_test', test_id=test_id))
+
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
 @jwt_required(role='admin')
 def delete_test(test_id):
-    # Clean up dependent records
     StudentSectionProgress.query.filter_by(test_id=test_id).delete()
     StudentTestMap.query.filter_by(test_id=test_id).delete()
-
-    # Now delete the test
     Test.query.filter_by(id=test_id).delete()
     db.session.commit()
 
@@ -248,7 +259,6 @@ def delete_test(test_id):
 
 @bp.route('/refresh_token', methods=['POST'])
 def refresh_token():
-    from flask import request, jsonify
     token = request.json.get('refresh_token')
     if not token:
         return jsonify({'error': 'Missing refresh token'}), 401

@@ -68,10 +68,16 @@
             </div>
 
             <!-- Confirm Form: Only Shown When CSV Exists -->
+            <!-- Confirm Form: Only Shown When CSV Exists -->
             <form method="POST">
                 <input type="hidden" name="confirm" value="true">
                 <button class="btn btn-success mt-4" type="submit">Confirm & Assign Test</button>
             </form>
+
+            <a class="btn btn-primary mt-3" href="{{ url_for('admin_routes.download_credentials', test_id=test_id) }}">
+                Download Credentials CSV
+            </a>
+
             {% endif %}
         </div>
     </div>
