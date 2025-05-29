@@ -1,13 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from pytz import timezone, utc
 from sqlalchemy.exc import OperationalError
 import pandas as pd
 import secrets
-import threading
 import os
-import tempfile
+from pathlib import Path
+
 from app import db
 from app.models import User, Test, Section, StudentTestMap, StudentSectionProgress
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
@@ -40,6 +40,7 @@ def login():
     session.pop('_flashes', None)
     return render_template('login.html')
 
+
 @bp.route('/logout')
 def logout():
     return redirect(url_for('admin_routes.login'))
@@ -48,9 +49,7 @@ def logout():
 @bp.route('/dashboard')
 @jwt_required(role='admin')
 def dashboard():
-    admin_id = request.user_id
-    admin = User.query.get(admin_id)
-    
+    admin = User.query.get(request.user_id)
     tests = Test.query.order_by(Test.id.desc()).all()
     return render_template('admin_dashboard.html', tests=tests, admin=admin)
 
@@ -67,42 +66,33 @@ def create_test():
 
     if request.method == 'POST':
         test_name = request.form['test_name']
-        #test_duration = int(request.form['test_duration'])
         ist = timezone('Asia/Kolkata')
         try:
-            start_date_input = request.form['start_date']
-            end_date_input = request.form['end_date']
-    
-            start_date = ist.localize(datetime.strptime(start_date_input, "%Y-%m-%dT%H:%M")).astimezone(utc)
-            end_date = ist.localize(datetime.strptime(end_date_input, "%Y-%m-%dT%H:%M")).astimezone(utc)
-
+            start_date = ist.localize(datetime.strptime(request.form['start_date'], "%Y-%m-%dT%H:%M")).astimezone(utc)
+            end_date = ist.localize(datetime.strptime(request.form['end_date'], "%Y-%m-%dT%H:%M")).astimezone(utc)
             if start_date >= end_date:
                 flash("⚠️ Start date must be before end date.", "danger")
                 return redirect(request.url)
-
             if end_date <= datetime.utcnow().astimezone(utc):
                 flash("⚠️ End date must be in the future.", "danger")
                 return redirect(request.url)
-
         except (ValueError, KeyError):
             flash("⚠️ Invalid date or time format.", "danger")
             return redirect(request.url)
 
-        selected_sections = request.form.getlist('sections')
-        if not selected_sections:
+        section_ids = request.form.getlist('sections')
+        if not section_ids:
             flash("You must select at least one section to create a test.", "danger")
             return redirect(request.url)
 
-        section_ids, num_questions, section_durations = [], [], []
-
-        for sid in selected_sections:
+        num_questions = []
+        section_durations = []
+        for sid in section_ids:
             nq = request.form.get(f'num_questions_{sid}')
             dur = request.form.get(f'section_durations_{sid}')
             if not nq or not dur or int(nq) <= 0 or int(dur) <= 0:
-                flash("Each selected section must have a valid number of questions and duration.", "danger")
+                flash("Each selected section must have valid question count and duration.", "danger")
                 return redirect(request.url)
-
-            section_ids.append(sid)
             num_questions.append(str(int(nq)))
             section_durations.append(str(int(dur)))
 
@@ -149,8 +139,8 @@ def assign_test(test_id):
 
                 if not student:
                     password_plain = secrets.token_urlsafe(6)
-                    hashed_pw = generate_password_hash(password_plain)
-                    student = User(name=name, email=email, password=hashed_pw, role='student')
+                    student = User(name=name, email=email,
+                                   password=generate_password_hash(password_plain), role='student')
                     db.session.add(student)
                     db.session.flush()
                 else:
@@ -161,8 +151,7 @@ def assign_test(test_id):
                         password_plain = secrets.token_urlsafe(6)
                         student.password = generate_password_hash(password_plain)
 
-                existing_map = StudentTestMap.query.filter_by(student_id=student.id, test_id=test_id).first()
-                if not existing_map:
+                if not StudentTestMap.query.filter_by(student_id=student.id, test_id=test_id).first():
                     db.session.add(StudentTestMap(student_id=student.id, test_id=test_id, password=password_plain))
 
                 student_creds.append((email, password_plain))
@@ -170,19 +159,21 @@ def assign_test(test_id):
             db.session.commit()
 
             records = [{
-                'sno': i+1,
+                'sno': i + 1,
                 'name': next((r['name'] for r in csv_data if r['email'] == email), ''),
                 'email': email,
                 'test_password': password,
                 'test_login_link': "http://practicetests.in/student/login"
             } for i, (email, password) in enumerate(student_creds)]
 
-            os.makedirs('static/downloads', exist_ok=True)
-            file_path = os.path.join(current_app.root_path, 'static', 'downloads', f"test_{test_id}_credentials.csv")
-            pd.DataFrame(records).to_csv(file_path, index=False)
+            # Save to absolute path in app/static/downloads
+            download_dir = Path(current_app.root_path) / "static" / "downloads"
+            download_dir.mkdir(parents=True, exist_ok=True)
 
-            flash("✅ Students assigned. You can now download the credentials.", "success")
-            return redirect(url_for('admin_routes.assign_test', test_id=test_id))
+            file_path = download_dir / f"test_{test_id}_credentials.csv"
+            pd.DataFrame(records).to_csv(file_path, index=False)
+            flash("Students assigned successfully. Download credentials below.", "success")
+            return redirect(request.url)
 
         else:
             file = request.files.get('csv_file')
@@ -192,7 +183,6 @@ def assign_test(test_id):
 
             df = pd.read_csv(file)
             rows = []
-
             for i, row in df.iterrows():
                 email = row.get('email') or row.get('Email')
                 name = row.get('name') or row.get('Name') or row.get('roll_number') or row.get('Roll Number')
@@ -213,19 +203,15 @@ def assign_test(test_id):
     return render_template("assign_test.html", test=test, test_id=test_id, csv_data=csv_data, admin=admin)
 
 
-from flask import current_app
-
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
-    # Absolute path based on where Flask is running
-    file_path = os.path.join(current_app.root_path, 'static', 'downloads', f"test_{test_id}_credentials.csv")
-
-    if not os.path.exists(file_path):
+    file_path = Path(current_app.root_path) / 'static' / 'downloads' / f"test_{test_id}_credentials.csv"
+    if not file_path.exists():
         flash("Credential file not found. Please assign the test first.", "danger")
         return redirect(url_for('admin_routes.assign_test', test_id=test_id))
-
     return send_file(file_path, as_attachment=True)
+
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
 @jwt_required(role='admin')
@@ -234,7 +220,6 @@ def delete_test(test_id):
     StudentTestMap.query.filter_by(test_id=test_id).delete()
     Test.query.filter_by(id=test_id).delete()
     db.session.commit()
-
     flash("Test deleted successfully.", "success")
     return redirect(url_for('admin_routes.dashboard'))
 
@@ -250,7 +235,5 @@ def refresh_token():
         return jsonify({'error': 'Invalid or expired refresh token'}), 403
 
     user_id = payload['sub']
-    role = 'admin'
-    new_access = generate_access_token(user_id, role)
-
+    new_access = generate_access_token(user_id, 'admin')
     return jsonify({'access_token': new_access})
