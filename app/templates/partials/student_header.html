@@ -5,10 +5,11 @@
 {% endif %}
   <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
 
-    <!-- Back Arrow + Logo -->
+    <!-- Back Arrow Image + Logo -->
     <div class="d-flex align-items-center gap-3">
-      <a href="javascript:history.back()" class="text-dark" style="font-size: 1.5rem; text-decoration: none;">
-        &#8592;
+      <a href="javascript:history.back()" class="text-dark">
+        <img src="https://cdn.iconscout.com/icon/free/png-256/free-back-arrow-icon-download-in-svg-png-gif-file-formats--left-direction-user-interface-pack-icons-1502574.png"
+             alt="Back" style="height: 28px; cursor: pointer;">
       </a>
       <a class="navbar-brand fw-bold text-black" href="{{ url_for('student_routes.dashboard') }}">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height: 40px;">
