@@ -12,39 +12,39 @@ from app import db
 from app.models import User, Test, Section, StudentTestMap, StudentSectionProgress
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app.utils.email_sender import send_credentials
-
+from flask import make_response
 bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
 
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    token = request.cookies.get('jwt_token')
-    if token:
-        payload = decode_token(token)
-        if payload and payload.get('role') == 'admin':
-            return redirect(url_for('admin_routes.dashboard'))
+    if request.method == 'GET':
+        # Clear cookies on arriving at login
+        response = make_response(render_template('login.html'))
+        response.set_cookie('jwt_token', '', expires=0)
+        response.set_cookie('refresh_token', '', expires=0)
+        return response
 
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        admin = User.query.filter_by(email=email, role='admin').first()
+    # POST flow: process login
+    email = request.form['email']
+    password = request.form['password']
+    admin = User.query.filter_by(email=email, role='admin').first()
 
-        if admin and check_password_hash(admin.password, password):
-            access_token = generate_access_token(admin.id, 'admin')
-            refresh_token = generate_refresh_token(admin.id)
+    if admin and check_password_hash(admin.password, password):
+        access_token = generate_access_token(admin.id, 'admin')
+        refresh_token = generate_refresh_token(admin.id)
 
-            response = jsonify({
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                'redirect_url': url_for('admin_routes.dashboard')
-            })
-            response.set_cookie('jwt_token', access_token, httponly=True, max_age=3600, samesite='Lax')
-            return response
-        else:
-            flash("Invalid credentials", "danger")
-            return redirect(request.url)
+        response = jsonify({
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'redirect_url': url_for('admin_routes.dashboard')
+        })
+        response.set_cookie('jwt_token', access_token, httponly=True, max_age=3600, samesite='Lax')
+        response.set_cookie('refresh_token', refresh_token, httponly=True, max_age=86400, samesite='Lax')
+        return response
 
-    return render_template('login.html')
+    flash("Invalid credentials", "danger")
+    return redirect(request.url)
 
 
 
