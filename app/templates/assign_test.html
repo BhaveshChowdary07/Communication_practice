@@ -11,18 +11,17 @@
     <div class="assign-gradient">
         <div class="container">
             <h1 class="page-title">Assign Test to Students</h1>
-            <p class="subtitle">Upload a CSV file with <code>name, email</code> columns.</p>
+            <p class="subtitle">Upload a CSV file with <code>name</code> and <code>email</code> columns.</p>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="flashes">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-
+              {% if messages %}
+                <div class="flashes">
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
 
             <!-- Upload CSV Form -->
             <form method="POST" enctype="multipart/form-data" class="upload-card">
@@ -67,21 +66,18 @@
                 </table>
             </div>
 
-            <!-- Confirm Form: Only Shown When CSV Exists -->
-            <!-- Confirm Form: Only Shown When CSV Exists -->
-            <form method="POST">
+            <!-- Confirm Form -->
+            <form method="POST" class="mt-4">
                 <input type="hidden" name="confirm" value="true">
-                <button class="btn btn-success mt-4" type="submit">Confirm & Assign Test</button>
+                <button class="btn btn-success" type="submit">Confirm & Assign Test</button>
             </form>
 
-            <a class="btn btn-primary mt-3"
-                href="{{ url_for('admin_routes.download_credentials', test_id=test_id) }}" download>
-                 Download Credentials CSV
-            </a>
-
-
-
-
+            <!-- Download Button -->
+            <div class="mt-3 text-end">
+                <a href="{{ url_for('admin_routes.download_credentials', test_id=test_id) }}" class="btn btn-outline-primary">
+                    Download Credentials CSV
+                </a>
+            </div>
             {% endif %}
         </div>
     </div>

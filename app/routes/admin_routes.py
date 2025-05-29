@@ -200,7 +200,7 @@ def assign_test(test_id):
             download_dir = os.path.join('static', 'downloads')
             os.makedirs(download_dir, exist_ok=True)
 
-            file_path = os.path.join(download_dir, f"credentials_test_{test_id}.csv")
+            file_path = os.path.join(download_dir, f"test_{test_id}_credentials.csv")
             pd.DataFrame(credentials_records).to_csv(file_path, index=False)
 
             flash("Students assigned! You can now download the credentials.", "success")
@@ -247,15 +247,17 @@ def assign_test(test_id):
     return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
 
 
+from flask import send_file
+import os
+
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
-    file_path = os.path.join('static', 'downloads', f"credentials_test_{test_id}.csv")
+    file_path = os.path.join('static', 'downloads', f"test_{test_id}_credentials.csv")
     if not os.path.exists(file_path):
         flash("Credential file not found. Please assign the test first.", "danger")
         return redirect(url_for('admin_routes.assign_test', test_id=test_id))
-
-    return send_file(file_path, as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
+    return send_file(file_path, as_attachment=True)
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
 @jwt_required(role='admin')
