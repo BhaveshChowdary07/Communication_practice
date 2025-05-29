@@ -6,7 +6,8 @@ from sqlalchemy.exc import OperationalError
 import pandas as pd
 import secrets
 import threading
-from flask import send_file
+import os
+
 from app import db
 from app.models import User, Test, Section, StudentTestMap, StudentSectionProgress
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
@@ -58,7 +59,12 @@ def dashboard():
 @bp.route('/create_test', methods=['GET', 'POST'])
 @jwt_required(role='admin')
 def create_test():
-    sections = Section.query.all()
+    try:
+        sections = Section.query.all()
+    except Exception as e:
+        flash("⚠️ Could not load sections from database. Please try again later.", "danger")
+        print(f"[CREATE_TEST_ERROR] {e}")
+        sections = []
 
     if request.method == 'POST':
         test_name = request.form['test_name']
@@ -177,7 +183,6 @@ def assign_test(test_id):
 
             db.session.commit()
 
-            # ✅ Generate credentials CSV
             credentials_records = []
             for idx, (email, password) in enumerate(student_creds, start=1):
                 name_row = next((r['name'] for r in csv_data if r['email'] == email), '')
@@ -238,7 +243,6 @@ def assign_test(test_id):
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
-    import os
     file_path = "credentials_download.csv"
     if not os.path.exists(file_path):
         flash("Credential file not found. Please assign the test first.", "danger")
