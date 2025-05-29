@@ -19,13 +19,10 @@ bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        # Clear cookies on arriving at login
         response = make_response(render_template('login.html'))
         response.set_cookie('jwt_token', '', expires=0)
         response.set_cookie('refresh_token', '', expires=0)
         return response
-
-    # POST flow: process login
     email = request.form['email']
     password = request.form['password']
     admin = User.query.filter_by(email=email, role='admin').first()
@@ -243,3 +240,11 @@ def refresh_token():
     user_id = payload['sub']
     new_access = generate_access_token(user_id, 'admin')
     return jsonify({'access_token': new_access})
+
+@bp.after_request
+def prevent_login_cache(response):
+    if request.path == '/admin/login':
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
