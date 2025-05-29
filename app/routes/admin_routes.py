@@ -6,7 +6,7 @@ from sqlalchemy.exc import OperationalError
 import pandas as pd
 import secrets
 import threading
-
+from flask import send_file
 from app import db
 from app.models import User, Test, Section, StudentTestMap, StudentSectionProgress
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
@@ -238,11 +238,13 @@ def assign_test(test_id):
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
-    try:
-        return send_file("credentials_download.csv", as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
-    except FileNotFoundError:
+    import os
+    file_path = "credentials_download.csv"
+    if not os.path.exists(file_path):
         flash("Credential file not found. Please assign the test first.", "danger")
         return redirect(url_for('admin_routes.assign_test', test_id=test_id))
+
+    return send_file(file_path, as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
 
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
