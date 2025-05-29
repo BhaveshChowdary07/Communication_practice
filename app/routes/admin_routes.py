@@ -18,6 +18,12 @@ bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    token = request.cookies.get('jwt_token')
+    if token:
+        payload = decode_token(token)
+        if payload and payload.get('role') == 'admin':
+            return redirect(url_for('admin_routes.dashboard'))
+
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -26,6 +32,7 @@ def login():
         if admin and check_password_hash(admin.password, password):
             access_token = generate_access_token(admin.id, 'admin')
             refresh_token = generate_refresh_token(admin.id)
+
             response = jsonify({
                 'access_token': access_token,
                 'refresh_token': refresh_token,
@@ -37,8 +44,8 @@ def login():
             flash("Invalid credentials", "danger")
             return redirect(request.url)
 
-    session.pop('_flashes', None)
     return render_template('login.html')
+
 
 
 @bp.route('/logout')
