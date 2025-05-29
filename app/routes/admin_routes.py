@@ -193,9 +193,12 @@ def assign_test(test_id):
                     'test_password': password,
                     'test_login_link': "http://practicetests.in/student/login"
                 })
-            temp_dir = tempfile.gettempdir()
-            file_path = os.path.join(temp_dir, f"credentials_download.csv")
+            download_dir = os.path.join('static', 'downloads')
+            os.makedirs(download_dir, exist_ok=True)
+
+            file_path = os.path.join(download_dir, f"credentials_test_{test_id}.csv")
             pd.DataFrame(credentials_records).to_csv(file_path, index=False)
+
 
 
             flash("Students assigned! You can now download the credentials.", "success")
@@ -247,18 +250,11 @@ from flask import after_this_request
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
-    file_path = os.path.join(tempfile.gettempdir(), f"credentials_download.csv")
+    file_path = os.path.join('static', 'downloads', f"credentials_test_{test_id}.csv")
+    
     if not os.path.exists(file_path):
         flash("Credential file not found. Please assign the test first.", "danger")
         return redirect(url_for('admin_routes.assign_test', test_id=test_id))
-
-    @after_this_request
-    def remove_file(response):
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            print(f"Cleanup failed: {e}")
-        return response
 
     return send_file(file_path, as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
 
