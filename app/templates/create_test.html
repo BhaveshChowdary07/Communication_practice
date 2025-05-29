@@ -12,7 +12,6 @@
         <div class="container">
             <h1 class="page-title">Create New Test</h1>
 
-            <!-- ✅ Flash message display -->
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
@@ -21,7 +20,6 @@
               {% endif %}
             {% endwith %}
 
-            <!-- ✅ Action added -->
             <form method="POST" action="{{ url_for('admin_routes.create_test') }}" class="test-card">
                 <label>Test Name</label>
                 <input type="text" name="test_name" placeholder="Enter test name" required>
@@ -34,13 +32,6 @@
                     <div class="col date-col">
                         <label for="end_date">End Date & Time</label>
                         <input type="datetime-local" name="end_date" id="end_date" required>
-                    </div>
-                </div>
-
-                <div class="row" style="display: none;">
-                    <div class="col">
-                        <label>Total Test Duration (mins)</label>
-                        <input type="number" name="test_duration" placeholder="e.g. 90" required>
                     </div>
                 </div>
 
@@ -67,6 +58,7 @@
             </form>
         </div>
     </div>
+
     <script>
     function toggleSectionInputs(sectionId) {
         const checked = document.getElementById(`section${sectionId}`).checked;
