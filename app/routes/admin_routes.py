@@ -129,6 +129,7 @@ def assign_test(test_id):
                 flash("CSV not found. Please upload again.", "danger")
                 return redirect(request.url)
 
+            df.reset_index(drop=True, inplace=True)
             csv_data = df.to_dict(orient='records')
             student_creds = []
 
@@ -157,7 +158,6 @@ def assign_test(test_id):
                 student_creds.append((email, password_plain))
 
             db.session.commit()
-
             records = [{
                 'sno': i + 1,
                 'name': next((r['name'] for r in csv_data if r['email'] == email), ''),
@@ -172,8 +172,7 @@ def assign_test(test_id):
 
             file_path = download_dir / f"test_{test_id}_credentials.csv"
             pd.DataFrame(records).to_csv(file_path, index=False)
-            flash("Students assigned successfully. Download credentials below.", "success")
-            return redirect(request.url)
+            return redirect(url_for('admin_routes.download_credentials', test_id=test_id))
 
         else:
             file = request.files.get('csv_file')
