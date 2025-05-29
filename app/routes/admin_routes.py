@@ -7,7 +7,7 @@ import pandas as pd
 import secrets
 import threading
 import os
-
+import tempfile
 from app import db
 from app.models import User, Test, Section, StudentTestMap, StudentSectionProgress
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
@@ -193,8 +193,10 @@ def assign_test(test_id):
                     'test_password': password,
                     'test_login_link': "http://practicetests.in/student/login"
                 })
+            temp_dir = tempfile.gettempdir()
+            file_path = os.path.join(temp_dir, f"credentials_download.csv")
+            pd.DataFrame(credentials_records).to_csv(file_path, index=False)
 
-            pd.DataFrame(credentials_records).to_csv("credentials_download.csv", index=False)
 
             flash("Students assigned! You can now download the credentials.", "success")
             return redirect(url_for('admin_routes.dashboard'))
@@ -240,16 +242,25 @@ def assign_test(test_id):
     return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
 
 
+from flask import after_this_request
+
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
-    file_path = "credentials_download.csv"
+    file_path = os.path.join(tempfile.gettempdir(), f"credentials_download.csv")
     if not os.path.exists(file_path):
         flash("Credential file not found. Please assign the test first.", "danger")
         return redirect(url_for('admin_routes.assign_test', test_id=test_id))
 
-    return send_file(file_path, as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(f"Cleanup failed: {e}")
+        return response
 
+    return send_file(file_path, as_attachment=True, download_name=f"test_{test_id}_credentials.csv")
 
 @bp.route('/delete_test/<int:test_id>', methods=['POST'])
 @jwt_required(role='admin')
