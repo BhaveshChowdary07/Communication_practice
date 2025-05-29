@@ -33,13 +33,12 @@
       </div>
     </div>
   </div>
-  <script>
-  // Force auth recheck when page is restored from bfcache (Back/Next button)
+<script>
   window.addEventListener('pageshow', function (event) {
-    // Only redirect if this is a persisted (bfcache) navigation
     if (event.persisted) {
-      const hasToken = document.cookie.includes('jwt_token');
-      if (!hasToken) {
+      const cookies = document.cookie.split(';').map(c => c.trim());
+      const isLoggedIn = cookies.some(c => c.startsWith('is_logged_in='));
+      if (!isLoggedIn) {
         window.location.href = '/admin/login';
       }
     }

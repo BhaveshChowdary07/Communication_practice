@@ -19,6 +19,7 @@ bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
 def login():
     if request.method == 'GET':
         response = make_response(render_template('login.html'))
+        response.set_cookie('is_logged_in', '', expires=0)
         response.set_cookie('jwt_token', '', expires=0)
         response.set_cookie('refresh_token', '', expires=0)
         return response
@@ -35,7 +36,14 @@ def login():
             'refresh_token': refresh_token,
             'redirect_url': url_for('admin_routes.dashboard')
         })
+        response = jsonify({
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'redirect_url': url_for('admin_routes.dashboard')
+        })
         response.set_cookie('jwt_token', access_token, httponly=True, max_age=3600, samesite='Lax')
+        response.set_cookie('refresh_token', refresh_token, httponly=True, max_age=86400, samesite='Lax')
+        response.set_cookie('is_logged_in', 'true', max_age=3600, samesite='Lax')  # ✅ New non-HttpOnly cookie
         response.set_cookie('refresh_token', refresh_token, httponly=True, max_age=86400, samesite='Lax')
         return response
 
