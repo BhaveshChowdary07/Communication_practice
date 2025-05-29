@@ -195,16 +195,16 @@ def assign_test(test_id):
                     'test_password': password,
                     'test_login_link': "http://practicetests.in/student/login"
                 })
+
+            # ✅ Write to static/downloads
             download_dir = os.path.join('static', 'downloads')
             os.makedirs(download_dir, exist_ok=True)
 
             file_path = os.path.join(download_dir, f"credentials_test_{test_id}.csv")
             pd.DataFrame(credentials_records).to_csv(file_path, index=False)
 
-
-
             flash("Students assigned! You can now download the credentials.", "success")
-            return redirect(url_for('admin_routes.dashboard'))
+            return redirect(url_for('admin_routes.assign_test', test_id=test_id))
 
         else:
             file = request.files.get('csv_file')
@@ -247,13 +247,10 @@ def assign_test(test_id):
     return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
 
 
-from flask import after_this_request
-
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
 def download_credentials(test_id):
     file_path = os.path.join('static', 'downloads', f"credentials_test_{test_id}.csv")
-    
     if not os.path.exists(file_path):
         flash("Credential file not found. Please assign the test first.", "danger")
         return redirect(url_for('admin_routes.assign_test', test_id=test_id))

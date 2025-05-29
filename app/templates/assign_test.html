@@ -75,7 +75,7 @@
             </form>
 
             <a class="btn btn-primary mt-3"
-                href="{{ url_for('static', filename='downloads/credentials_test_' ~ test_id ~ '.csv') }}" download>
+                href="{{ url_for('admin_routes.download_credentials', test_id=test_id) }}" download>
                  Download Credentials CSV
             </a>
 
