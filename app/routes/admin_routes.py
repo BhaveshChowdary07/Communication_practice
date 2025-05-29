@@ -26,7 +26,6 @@ def login():
         if admin and check_password_hash(admin.password, password):
             access_token = generate_access_token(admin.id, 'admin')
             refresh_token = generate_refresh_token(admin.id)
-
             response = jsonify({
                 'access_token': access_token,
                 'refresh_token': refresh_token,
@@ -38,10 +37,8 @@ def login():
             flash("Invalid credentials", "danger")
             return redirect(request.url)
 
-    # ✅ Clear lingering messages on GET
     session.pop('_flashes', None)
     return render_template('login.html')
-
 
 @bp.route('/logout')
 def logout():
@@ -132,21 +129,14 @@ def create_test():
 @jwt_required(role='admin')
 def assign_test(test_id):
     csv_data = None
-    try:
-        test = db.session.get(Test, test_id)
-    except OperationalError:
-        flash("Could not load test from database. Please try again later.", "danger")
-        return redirect(url_for('admin_routes.dashboard'))
+    test = Test.query.get_or_404(test_id)
 
-    if request.method == 'GET':
-        session.pop('_flashes', None)
-
-    elif request.method == 'POST':
+    if request.method == 'POST':
         if 'confirm' in request.form:
             try:
                 df = pd.read_csv("temp_upload.csv")
             except FileNotFoundError:
-                flash("Temporary upload file not found. Please upload the CSV again.", "danger")
+                flash("CSV not found. Please upload again.", "danger")
                 return redirect(request.url)
 
             csv_data = df.to_dict(orient='records')
@@ -155,7 +145,6 @@ def assign_test(test_id):
             for _, row in df.iterrows():
                 name = row['name']
                 email = row['email']
-
                 student = User.query.filter_by(email=email, role='student').first()
 
                 if not student:
@@ -165,90 +154,64 @@ def assign_test(test_id):
                     db.session.add(student)
                     db.session.flush()
                 else:
-                    existing_map_any = StudentTestMap.query.filter_by(student_id=student.id).first()
-                    if existing_map_any and existing_map_any.password:
-                        password_plain = existing_map_any.password
+                    map_any = StudentTestMap.query.filter_by(student_id=student.id).first()
+                    if map_any and map_any.password:
+                        password_plain = map_any.password
                     else:
                         password_plain = secrets.token_urlsafe(6)
                         student.password = generate_password_hash(password_plain)
 
                 existing_map = StudentTestMap.query.filter_by(student_id=student.id, test_id=test_id).first()
                 if not existing_map:
-                    map_entry = StudentTestMap(
-                        student_id=student.id,
-                        test_id=test_id,
-                        password=password_plain
-                    )
-                    db.session.add(map_entry)
+                    db.session.add(StudentTestMap(student_id=student.id, test_id=test_id, password=password_plain))
 
                 student_creds.append((email, password_plain))
 
             db.session.commit()
 
-            credentials_records = []
-            for idx, (email, password) in enumerate(student_creds, start=1):
-                name_row = next((r['name'] for r in csv_data if r['email'] == email), '')
-                credentials_records.append({
-                    'sno': idx,
-                    'name': name_row,
-                    'email': email,
-                    'test_password': password,
-                    'test_login_link': "http://practicetests.in/student/login"
-                })
+            records = [{
+                'sno': i+1,
+                'name': next((r['name'] for r in csv_data if r['email'] == email), ''),
+                'email': email,
+                'test_password': password,
+                'test_login_link': "http://practicetests.in/student/login"
+            } for i, (email, password) in enumerate(student_creds)]
 
-            # ✅ Write to static/downloads
-            download_dir = os.path.join('static', 'downloads')
-            os.makedirs(download_dir, exist_ok=True)
+            os.makedirs('static/downloads', exist_ok=True)
+            file_path = os.path.join('static', 'downloads', f"test_{test_id}_credentials.csv")
+            pd.DataFrame(records).to_csv(file_path, index=False)
 
-            file_path = os.path.join(download_dir, f"test_{test_id}_credentials.csv")
-            pd.DataFrame(credentials_records).to_csv(file_path, index=False)
-
-            flash("Students assigned! You can now download the credentials.", "success")
+            flash("✅ Students assigned. You can now download the credentials.", "success")
             return redirect(url_for('admin_routes.assign_test', test_id=test_id))
 
         else:
             file = request.files.get('csv_file')
             if not file:
-                flash("No file uploaded", "danger")
+                flash("Please upload a CSV file.", "danger")
                 return redirect(request.url)
 
             df = pd.read_csv(file)
             rows = []
 
-            for index, row in df.iterrows():
-                email = row.get('email') or row.get('Email') or row.get('EMAIL')
-                if not email:
-                    flash(f"Row {index + 2} is missing an email. Skipping.", "danger")
+            for i, row in df.iterrows():
+                email = row.get('email') or row.get('Email')
+                name = row.get('name') or row.get('Name') or row.get('roll_number') or row.get('Roll Number')
+                if not email or not name:
                     continue
-
-                name = row.get('name') or row.get('Name')
-                if not name:
-                    name = row.get('roll_number') or row.get('Roll Number') or row.get('Roll_Number') or row.get('roll')
-
-                if not name:
-                    flash(f"Row {index + 2} has no name or roll number. Skipping.", "danger")
-                    continue
-
-                rows.append({
-                    'name': str(name).strip(),
-                    'email': str(email).strip()
-                })
+                rows.append({'name': str(name).strip(), 'email': str(email).strip()})
 
             if not rows:
-                flash("No valid rows found in the uploaded CSV. Please check formatting.", "danger")
+                flash("CSV is empty or incorrectly formatted.", "danger")
                 return redirect(request.url)
 
             df = pd.DataFrame(rows)
             df.to_csv("temp_upload.csv", index=False)
-            csv_data = df.to_dict(orient='records')
-            flash("Preview the test and students below. Click 'Confirm & Assign Test' to continue.", "info")
+            csv_data = rows
+            flash("CSV uploaded successfully. Preview below.", "info")
 
     admin = User.query.get(request.user_id)
-    return render_template("assign_test.html", test_id=test_id, test=test, csv_data=csv_data, admin=admin)
+    return render_template("assign_test.html", test=test, test_id=test_id, csv_data=csv_data, admin=admin)
 
-
-from flask import send_file
-import os
 
 @bp.route('/download_credentials/<int:test_id>')
 @jwt_required(role='admin')
