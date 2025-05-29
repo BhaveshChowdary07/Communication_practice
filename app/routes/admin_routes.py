@@ -19,7 +19,6 @@ bp = Blueprint('admin_routes', __name__, url_prefix='/admin')
 def login():
     if request.method == 'GET':
         response = make_response(render_template('login.html'))
-        response.set_cookie('is_logged_in', '', expires=0)
         response.set_cookie('jwt_token', '', expires=0)
         response.set_cookie('refresh_token', '', expires=0)
         return response

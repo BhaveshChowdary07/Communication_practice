@@ -34,13 +34,10 @@
     </div>
   </div>
 <script>
+  // Force full reload if browser restores page from back/forward cache
   window.addEventListener('pageshow', function (event) {
     if (event.persisted) {
-      const cookies = document.cookie.split(';').map(c => c.trim());
-      const isLoggedIn = cookies.some(c => c.startsWith('is_logged_in='));
-      if (!isLoggedIn) {
-        window.location.href = '/admin/login';
-      }
+      window.location.reload(); // 🛡️ Force token recheck by server
     }
   });
 </script>
