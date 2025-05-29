@@ -34,10 +34,12 @@ def login():
             })
             response.set_cookie('jwt_token', access_token, httponly=True, max_age=3600, samesite='Lax')
             return response
-
         else:
-            return jsonify({'error': 'Invalid credentials'}), 401
+            flash("Invalid credentials", "danger")
+            return redirect(request.url)
 
+    # ✅ Clear lingering messages on GET
+    session.pop('_flashes', None)
     return render_template('login.html')
 
 
@@ -68,7 +70,7 @@ def create_test():
 
     if request.method == 'POST':
         test_name = request.form['test_name']
-        test_duration = int(request.form['test_duration'])
+        #test_duration = int(request.form['test_duration'])
         ist = timezone('Asia/Kolkata')
         try:
             start_date_input = request.form['start_date']
@@ -112,7 +114,7 @@ def create_test():
             sections=",".join(section_ids),
             num_questions=",".join(num_questions),
             section_durations=",".join(section_durations),
-            test_duration=test_duration,
+            test_duration=0,
             start_date=start_date,
             end_date=end_date,
             created_by=request.user_id

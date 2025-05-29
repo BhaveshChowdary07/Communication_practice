@@ -74,9 +74,11 @@
                 <button class="btn btn-success mt-4" type="submit">Confirm & Assign Test</button>
             </form>
 
-            <a class="btn btn-primary mt-3" href="{{ url_for('admin_routes.download_credentials', test_id=test_id) }}">
-                Download Credentials CSV
+            <a class="btn btn-primary mt-3"
+                href="{{ url_for('static', filename='downloads/credentials_test_' ~ test_id ~ '.csv') }}" download>
+                 Download Credentials CSV
             </a>
+
 
 
 
