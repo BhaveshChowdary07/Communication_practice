@@ -1,19 +1,22 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm py-2 sticky-header">
-  <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+  <div class="container-fluid d-flex justify-content-between align-items-center px-4">
 
     <!-- Back Arrow + Logo -->
-    <div class="d-flex align-items-center gap-3">
-      <a href="javascript:history.back()" class="text-dark d-flex align-items-center">
+    <div class="d-flex align-items-center" style="gap: 16px; min-width: 200px;">
+      <a href="javascript:history.back()" class="text-dark d-flex align-items-center" style="height: 40px;">
         <img src="https://cdn.iconscout.com/icon/free/png-256/free-back-arrow-icon-download-in-svg-png-gif-file-formats--left-direction-user-interface-pack-icons-1502574.png"
-             alt="Back" style="height: 28px; cursor: pointer;">
+             alt="Back" style="height: 26px;">
       </a>
-      <a class="navbar-brand fw-bold text-black d-flex align-items-center" href="{{ url_for('admin_routes.dashboard') }}">
+      <a class="navbar-brand fw-bold text-black" href="{{ url_for('admin_routes.dashboard') }}">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height: 40px;">
       </a>
     </div>
 
+    <!-- Spacer (centered content if needed) -->
+    <div class="flex-grow-1"></div>
+
     <!-- Admin Info & Logout -->
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center gap-3" style="min-width: 200px; justify-content: end;">
       {% if admin %}
         <span class="fw-semibold text-dark mb-0">Hi, {{ admin.name }}</span>
       {% endif %}
@@ -30,11 +33,7 @@
     z-index: 1000;
   }
 
-  .navbar-brand img {
-    vertical-align: middle;
-  }
-
-  .navbar .btn-outline-dark {
-    font-weight: 500;
+  .navbar .navbar-brand img {
+    height: 40px;
   }
 </style>
