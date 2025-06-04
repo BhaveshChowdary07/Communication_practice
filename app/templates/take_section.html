@@ -17,8 +17,12 @@
     {% set total = questions | length %}
     {% set q = questions[current_index] %}
 
-    <!-- SECTION HANDLER -->
-    {% if section.type == 'essay_writing' %}
+    <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="current_index" value="{{ current_index }}">
+    <input type="hidden" id="submit-hidden" name="submit" value="">
+
+  <!-- SECTION HANDLER -->
+  {% if section.type == 'essay_writing' %}
       {% include 'essay.html' %}
     {% elif section.type == 'short_stories' %}
       {% include 'short_stories.html' %}
@@ -38,6 +42,7 @@
       {% include 'story_retelling.html' %}
     {% endif %}
   </div>
+</form>
 </body>
 <script>
 let mediaRecorder = null;
@@ -60,8 +65,17 @@ function toggleRecording(questionId, btn) {
         btn.classList.add("btn-outline-danger");
         stream.getTracks().forEach(track => track.stop());
         activeBtn = null;
-      };
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const fileInput = document.getElementById("audio_input_" + questionId);
 
+        if (fileInput) {
+          const file = new File([audioBlob], `response_${questionId}.wav`, { type: "audio/wav" });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+        }
+      };
+      
       mediaRecorder.start();
       btn.innerText = "⏹ Stop Recording";
       btn.classList.remove("btn-outline-danger");

@@ -130,7 +130,6 @@ from app.models import (
 def take_section(section_id):
     student_id = request.user_id
 
-    # Identify matched test
     test_maps = StudentTestMap.query.filter_by(student_id=student_id).order_by(StudentTestMap.assigned_date.desc()).all()
     matched_test = None
     for test_map in test_maps:
@@ -152,13 +151,10 @@ def take_section(section_id):
         index = section_ids.index(str(section_id))
         question_limit = int(question_counts[index])
         section_duration = int(section_durations[index])
-        print("DEBUG section_durations:", section_durations)
-        print("Parsed duration for section:", section_duration)
     except ValueError:
         flash("Section not configured correctly in test.", "danger")
         return redirect(url_for('student_routes.dashboard'))
-    
-    # Check if already submitted
+
     existing_progress = StudentSectionProgress.query.filter_by(
         student_id=student_id,
         test_id=matched_test.id,
@@ -169,7 +165,6 @@ def take_section(section_id):
         flash("This section has already been submitted. You cannot retake it.", "warning")
         return redirect(url_for('student_routes.dashboard'))
 
-    # Create progress if it doesn't exist
     if not existing_progress:
         existing_progress = StudentSectionProgress(
             student_id=student_id,
@@ -180,14 +175,11 @@ def take_section(section_id):
         db.session.add(existing_progress)
         db.session.commit()
 
-
     from pytz import utc
-
     end_time = existing_progress.start_time.replace(tzinfo=utc) + timedelta(minutes=section_duration)
     end_timestamp = int(end_time.timestamp() * 1000)
 
-
-    # Fetch questions by type
+    # Get Questions
     if section.type == 'grammar':
         all_questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(SectionQuestion.id).all()
         model1, model2, model3 = all_questions[0:50], all_questions[50:100], all_questions[100:150]
@@ -200,30 +192,25 @@ def take_section(section_id):
         shuffle(questions)
 
     elif section.type in ['short_stories', 'reading_comprehension']:
-        # ✅ RANDOMIZED main questions
         questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(func.random()).limit(question_limit).all()
-
         for q in questions:
-            # ✅ RANDOMIZED subquestions
             subquestions = db.session.execute(
                 text("SELECT * FROM mcq_subquestions WHERE section_question_id = :id ORDER BY RANDOM() LIMIT 3"),
                 {"id": q.id}
             ).mappings().all()
-
-            q.subquestions = [
-                {
+            q.subquestions = [{
                 'question': sq['question_text'],
                 'option_a': sq['option_a'],
                 'option_b': sq['option_b'],
                 'option_c': sq['option_c'],
-                'option_d': sq['option_d']
-                } for sq in subquestions
-            ]
+                'option_d': sq['option_d'],
+                'correct': sq['correct_option'],
+                'id': sq['id']
+            } for sq in subquestions]
 
     else:
-        # ✅ RANDOMIZED for all other sections
         questions = SectionQuestion.query.filter_by(section_id=section_id).order_by(func.random()).limit(question_limit).all()
-    # Navigation and submission logic
+
     current_index = 0
     if request.method == 'POST':
         try:
@@ -231,7 +218,7 @@ def take_section(section_id):
             end_timestamp = int(request.form.get('end_timestamp'))
         except (ValueError, TypeError):
             current_index = 0
-            end_timestamp = int(datetime.utcnow().timestamp() * 1000)  # fallback
+            end_timestamp = int(datetime.utcnow().timestamp() * 1000)
 
         if 'next' in request.form:
             current_index = min(current_index + 1, len(questions) - 1)
@@ -240,8 +227,32 @@ def take_section(section_id):
         elif 'submit' in request.form:
             existing_progress.submitted = True
             db.session.commit()
-            flash("Section submitted!", "success")
-            return redirect(url_for('student_routes.dashboard'))
+
+            results = []
+
+            if section.type in ['short_stories', 'reading_comprehension']:
+                for q in questions:
+                    for subq in q.subquestions:
+                        ans = request.form.get(f"answer_sub_{subq['id']}")
+                        is_correct = ans == subq['correct']
+                        results.append({
+                            'question': subq['question'],
+                            'submitted': ans,
+                            'correct': subq['correct'],
+                            'is_correct': is_correct
+                        })
+            elif section.type in ['grammar', 'multiple_choice']:
+                for q in questions:
+                    ans = request.form.get(f"answer_{q.id}")
+                    is_correct = ans == q.correct_option
+                    results.append({
+                        'question': q.question_text,
+                        'submitted': ans,
+                        'correct': q.correct_option,
+                        'is_correct': is_correct
+                    })
+
+            return render_template("mcq_results.html", section=section, results=results)
 
     return render_template("take_section.html",
         section=section,
