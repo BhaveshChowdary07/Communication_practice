@@ -34,12 +34,17 @@
     </div>
   </div>
 <script>
-  // Force full reload if browser restores page from back/forward cache
-  window.addEventListener('pageshow', function (event) {
-    if (event.persisted) {
-      window.location.reload(); // 🛡️ Force token recheck by server
-    }
-  });
+  const shouldForceReload = () => {
+    const navType = performance.getEntriesByType("navigation")[0]?.type || performance.navigation.type;
+
+    // "back_forward" for new Navigation API, 2 for legacy
+    return navType === "back_forward" || navType === 2;
+  };
+
+  if (shouldForceReload()) {
+    // Full reload to ensure @jwt_required runs
+    window.location.reload();
+  }
 </script>
 </body>
 </html>
