@@ -1,13 +1,13 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm py-2 sticky-header">
   <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
 
-    <!-- Back Arrow Image + Logo -->
+    <!-- Back Arrow + Logo -->
     <div class="d-flex align-items-center gap-3">
-      <a href="javascript:history.back()" class="text-dark">
+      <a href="javascript:history.back()" class="text-dark d-flex align-items-center">
         <img src="https://cdn.iconscout.com/icon/free/png-256/free-back-arrow-icon-download-in-svg-png-gif-file-formats--left-direction-user-interface-pack-icons-1502574.png"
              alt="Back" style="height: 28px; cursor: pointer;">
       </a>
-      <a class="navbar-brand fw-bold text-black" href="{{ url_for('admin_routes.dashboard') }}">
+      <a class="navbar-brand fw-bold text-black d-flex align-items-center" href="{{ url_for('admin_routes.dashboard') }}">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height: 40px;">
       </a>
     </div>
@@ -28,5 +28,13 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+  }
+
+  .navbar-brand img {
+    vertical-align: middle;
+  }
+
+  .navbar .btn-outline-dark {
+    font-weight: 500;
   }
 </style>
