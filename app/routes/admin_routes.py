@@ -55,12 +55,17 @@ def login():
 def logout():
     return redirect(url_for('admin_routes.login'))
 
-
 @bp.route('/dashboard')
 @jwt_required(role='admin')
 def dashboard():
     admin = User.query.get(request.user_id)
     tests = Test.query.order_by(Test.id.desc()).all()
+
+    ist = timezone('Asia/Kolkata')
+    for test in tests:
+        test.start_date = test.start_date.astimezone(ist)
+        test.end_date = test.end_date.astimezone(ist)
+
     return render_template('admin_dashboard.html', tests=tests, admin=admin)
 
 

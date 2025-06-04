@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash
 from io import BytesIO
 from random import sample, shuffle
 import sys
+from pytz import timezone
 from sqlalchemy import text
 from app.utils.jwt_utils import generate_access_token, generate_refresh_token, decode_token, jwt_required
 from app import db
@@ -54,14 +55,18 @@ def dashboard():
     test_maps = StudentTestMap.query.filter_by(student_id=student_id).all()
     enriched_tests = []
 
+    ist = timezone('Asia/Kolkata')
+    now = datetime.now(ist)
+
     for tm in test_maps:
         test = Test.query.get(tm.test_id)
         if test:
-            now = datetime.utcnow()
+            start = test.start_date.astimezone(ist)
+            end = test.end_date.astimezone(ist)
 
-            if now < test.start_date:
+            if now < start:
                 test_status = "not_started"
-            elif now > test.end_date:
+            elif now > end:
                 test_status = "completed"
             else:
                 test_status = "active"
@@ -82,7 +87,7 @@ def dashboard():
                 'test': test,
                 'sections': sections,
                 'status': section_status,
-                'availability': test_status  # 👈 add availability status
+                'availability': test_status
             })
 
     return render_template("student_dashboard.html", tests=enriched_tests, student=student)
