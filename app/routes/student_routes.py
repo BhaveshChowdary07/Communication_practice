@@ -61,19 +61,23 @@ def dashboard():
     for tm in test_maps:
         test = Test.query.get(tm.test_id)
         if test:
-            start = test.start_date.astimezone(ist)
-            end = test.end_date.astimezone(ist)
+            # Convert test start and end dates to IST for display
+            test.start_date = test.start_date.astimezone(ist)
+            test.end_date = test.end_date.astimezone(ist)
 
-            if now < start:
+            # Determine test availability
+            if now < test.start_date:
                 test_status = "not_started"
-            elif now > end:
+            elif now > test.end_date:
                 test_status = "completed"
             else:
                 test_status = "active"
 
+            # Get sections
             section_ids = [int(sid) for sid in test.sections.split(',') if sid.strip()]
             sections = Section.query.filter(Section.id.in_(section_ids)).all()
 
+            # Track section completion status
             section_status = {}
             for section in sections:
                 progress = StudentSectionProgress.query.filter_by(
