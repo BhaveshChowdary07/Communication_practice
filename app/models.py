@@ -39,6 +39,7 @@ class Section(db.Model):
     name = db.Column(db.String(100))
     type = db.Column(db.String(50))
     description = db.Column(db.Text)
+
 class SectionQuestion(db.Model):
     __tablename__ = 'section_questions'  # ✅ matches your table
 
@@ -54,6 +55,7 @@ class SectionQuestion(db.Model):
     correct_option = db.Column(db.String(1))  # if MCQ
     is_text_input = db.Column(db.Boolean, default=True)
     is_audio_input = db.Column(db.Boolean, default=False)
+
 class StudentSectionProgress(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -61,3 +63,13 @@ class StudentSectionProgress(db.Model):
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'))
     start_time = db.Column(db.DateTime)
     submitted = db.Column(db.Boolean, default=False)
+
+class StudentSectionAttempt(db.Model):
+    __tablename__ = 'student_section_attempts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
+    completed_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
+

@@ -80,12 +80,13 @@ def dashboard():
             # Track section completion status
             section_status = {}
             for section in sections:
-                progress = StudentSectionProgress.query.filter_by(
+                from app.models import StudentSectionAttempt
+                progress = StudentSectionAttempt.query.filter_by(
                     student_id=student_id,
                     test_id=test.id,
                     section_id=section.id
                 ).first()
-                section_status[section.id] = 'Completed' if progress and progress.submitted else 'Not Started'
+                section_status[section.id] = 'Completed' if progress else 'Not Started'
 
             enriched_tests.append({
                 'test': test,
@@ -227,6 +228,22 @@ def take_section(section_id):
         elif 'submit' in request.form:
             existing_progress.submitted = True
             db.session.commit()
+
+            # ✅ Log section attempt
+            from app.models import StudentSectionAttempt
+            already_logged = StudentSectionAttempt.query.filter_by(
+            student_id=student_id,
+            test_id=matched_test.id,
+            section_id=section_id
+            ).first()
+            if not already_logged:
+                attempt = StudentSectionAttempt(
+                    student_id=student_id,
+                    test_id=matched_test.id,
+                    section_id=section_id
+                )
+                db.session.add(attempt)
+                db.session.commit()
 
             results = []
 
