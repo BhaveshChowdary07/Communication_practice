@@ -11,123 +11,125 @@
 
 <body class="bg-light">
   {% include 'partials/student_header.html' with context %}
-  <div class="container px-3 pb-2 mt-4">
 
-</div>
+  <div class="container px-3 pb-2 mt-4">
+    <!-- Extra UI if needed -->
+  </div>
+
   <div class="gradient-bg">
     {% set total = questions | length %}
     {% set q = questions[current_index] %}
 
     <form method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="current_index" value="{{ current_index }}">
-    <input type="hidden" id="submit-hidden" name="submit" value="">
+      <input type="hidden" name="current_index" value="{{ current_index }}">
+      <input type="hidden" id="submit-hidden" name="submit" value="">
 
-  <!-- SECTION HANDLER -->
-  {% if section.type == 'essay_writing' %}
-      {% include 'essay.html' %}
-    {% elif section.type == 'short_stories' %}
-      {% include 'short_stories.html' %}
-    {% elif section.type == 'reading_comprehension' %}
-      {% include 'reading_comprehension.html' %}
-    {% elif section.type == 'grammar' %}
-      {% include 'grammar.html' %}
-    {% elif section.type == 'sentence_repeating' %}
-      {% include 'sentence_repeating.html' %}
-    {% elif section.type == 'sentence_reading' %}
-      {% include 'sentence_reading.html' %}
-    {% elif section.type == 'just_a_minute' %}
-      {% include 'just_a_minute.html' %}
-    {% elif section.type == 'jumbled_sentences' %}
-      {% include 'jumbled_sentences.html' %}
-    {% elif section.type == 'story_retelling' %}
-      {% include 'story_retelling.html' %}
-    {% endif %}
+      <!-- SECTION HANDLER -->
+      {% if section.type == 'essay_writing' %}
+        {% include 'essay.html' %}
+      {% elif section.type == 'short_stories' %}
+        {% include 'short_stories.html' %}
+      {% elif section.type == 'reading_comprehension' %}
+        {% include 'reading_comprehension.html' %}
+      {% elif section.type == 'grammar' %}
+        {% include 'grammar.html' %}
+      {% elif section.type == 'sentence_repeating' %}
+        {% include 'sentence_repeating.html' %}
+      {% elif section.type == 'sentence_reading' %}
+        {% include 'sentence_reading.html' %}
+      {% elif section.type == 'just_a_minute' %}
+        {% include 'just_a_minute.html' %}
+      {% elif section.type == 'jumbled_sentences' %}
+        {% include 'jumbled_sentences.html' %}
+      {% elif section.type == 'story_retelling' %}
+        {% include 'story_retelling.html' %}
+      {% endif %}
+    </form>
   </div>
-</form>
-</body>
-<script>
-let mediaRecorder = null;
-let audioChunks = [];
-let activeBtn = null;
 
-function toggleRecording(questionId, btn) {
-  if (!mediaRecorder || mediaRecorder.state === "inactive") {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
+  <script>
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let activeBtn = null;
 
-      mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-      };
+    function toggleRecording(questionId, btn) {
+      if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
 
-      mediaRecorder.onstop = () => {
-        btn.innerText = "🎙️ Record Audio";
-        btn.classList.remove("btn-secondary");
-        btn.classList.add("btn-outline-danger");
-        stream.getTracks().forEach(track => track.stop());
-        activeBtn = null;
-        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        const fileInput = document.getElementById("audio_input_" + questionId);
+          mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+          };
 
-        if (fileInput) {
-          const file = new File([audioBlob], `response_${questionId}.wav`, { type: "audio/wav" });
-          const dataTransfer = new DataTransfer();
-          dataTransfer.items.add(file);
-          fileInput.files = dataTransfer.files;
-        }
-      };
-      
-      mediaRecorder.start();
-      btn.innerText = "⏹ Stop Recording";
-      btn.classList.remove("btn-outline-danger");
-      btn.classList.add("btn-secondary");
-      activeBtn = btn;
-    }).catch(error => {
-      console.error("Microphone access denied:", error);
-      alert("Please allow microphone access to record audio.");
-    });
-  } else if (mediaRecorder.state === "recording") {
-    mediaRecorder.stop();
-  }
-}
+          mediaRecorder.onstop = () => {
+            btn.innerText = "🎙️ Record Audio";
+            btn.classList.remove("btn-secondary");
+            btn.classList.add("btn-outline-danger");
+            stream.getTracks().forEach(track => track.stop());
+            activeBtn = null;
 
-function stopActiveRecording() {
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
-  }
-}
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const fileInput = document.getElementById("audio_input_" + questionId);
 
-function playAudio(questionId) {
-  const audio = new Audio(`/student/audio/${questionId}`);
-  audio.play().catch(error => {
-    console.error("Audio play failed:", error);
-    alert("Could not play audio. Please check your device settings.");
-  });
-}
+            if (fileInput) {
+              const file = new File([audioBlob], `response_${questionId}.wav`, { type: "audio/wav" });
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(file);
+              fileInput.files = dataTransfer.files;
+            }
+          };
 
-function startTimer(endTime) {
-  const countdown = document.getElementById("timer");
-  countdown.style.opacity = 1;
-  const interval = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = endTime - now;
-
-    if (distance <= 0) {
-      clearInterval(interval);
-      countdown.innerHTML = "Time's up!";
-      document.getElementById("submit-hidden").value = "1";
-      document.querySelector("form").submit();
-    } else {
-      const minutes = Math.floor(distance / 60000);
-      const seconds = Math.floor((distance % 60000) / 1000);
-      countdown.innerHTML = `${minutes}m ${seconds}s`;
+          mediaRecorder.start();
+          btn.innerText = "⏹ Stop Recording";
+          btn.classList.remove("btn-outline-danger");
+          btn.classList.add("btn-secondary");
+          activeBtn = btn;
+        }).catch(error => {
+          console.error("Microphone access denied:", error);
+          alert("Please allow microphone access to record audio.");
+        });
+      } else if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
     }
-  }, 1000);
-}
 
-const endTimestamp = {{ end_timestamp | tojson }};
-console.log("Client-side endTimestamp:", endTimestamp);
-console.log("Current time:", new Date().getTime());
-startTimer(endTimestamp);
-</script>
+    function stopActiveRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+    }
+
+    function playAudio(questionId) {
+      const audio = new Audio(`/student/audio/${questionId}`);
+      audio.play().catch(error => {
+        console.error("Audio play failed:", error);
+        alert("Could not play audio. Please check your device settings.");
+      });
+    }
+
+    function startTimer(endTime) {
+      const countdown = document.getElementById("timer");
+      countdown.style.opacity = 1;
+      const interval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endTime - now;
+
+        if (distance <= 0) {
+          clearInterval(interval);
+          countdown.innerHTML = "Time's up!";
+          document.getElementById("submit-hidden").value = "1";
+          document.querySelector("form").submit();
+        } else {
+          const minutes = Math.floor(distance / 60000);
+          const seconds = Math.floor((distance % 60000) / 1000);
+          countdown.innerHTML = `${minutes}m ${seconds}s`;
+        }
+      }, 1000);
+    }
+
+    const endTimestamp = {{ end_timestamp | tojson }};
+    startTimer(endTimestamp);
+  </script>
+</body>
 </html>
