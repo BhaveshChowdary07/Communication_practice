@@ -35,15 +35,9 @@ def login():
             'refresh_token': refresh_token,
             'redirect_url': url_for('admin_routes.dashboard')
         })
-        response = jsonify({
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'redirect_url': url_for('admin_routes.dashboard')
-        })
         response.set_cookie('jwt_token', access_token, httponly=True, max_age=3600, samesite='Lax')
         response.set_cookie('refresh_token', refresh_token, httponly=True, max_age=86400, samesite='Lax')
         response.set_cookie('is_logged_in', 'true', max_age=3600, samesite='Lax')  # ✅ New non-HttpOnly cookie
-        response.set_cookie('refresh_token', refresh_token, httponly=True, max_age=86400, samesite='Lax')
         return response
 
     flash("Invalid credentials", "danger")
@@ -53,7 +47,12 @@ def login():
 
 @bp.route('/logout')
 def logout():
-    return redirect(url_for('admin_routes.login'))
+    response = redirect(url_for('admin_routes.login'))
+    response.set_cookie('jwt_token', '', expires=0)
+    response.set_cookie('refresh_token', '', expires=0)
+    response.set_cookie('is_logged_in', '', expires=0)
+    return response
+
 
 @bp.route('/dashboard')
 @jwt_required(role='admin')

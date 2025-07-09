@@ -63,8 +63,8 @@ class StudentSectionProgress(db.Model):
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'))
     start_time = db.Column(db.DateTime)
     submitted = db.Column(db.Boolean, default=False)
-    question_ids = db.Column(db.Text)
-
+    question_ids = db.Column(db.Text, nullable=True)
+    
 class StudentSectionAttempt(db.Model):
     __tablename__ = 'student_section_attempts'
 
